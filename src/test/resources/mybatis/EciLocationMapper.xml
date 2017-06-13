@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.zhou.mapper.dao.EciLocationMapper" >
+  <resultMap id="BaseResultMap" type="cn.zhou.mapper.model.EciLocation" >
+    <id column="eci" property="eci" jdbcType="BIGINT" />
+    <result column="eci_name" property="eciName" jdbcType="VARCHAR" />
+    <result column="cell_name" property="cellName" jdbcType="VARCHAR" />
+    <result column="longitude" property="longitude" jdbcType="NUMERIC" />
+    <result column="latitude" property="latitude" jdbcType="NUMERIC" />
+    <result column="coord_x" property="coordX" jdbcType="INTEGER" />
+    <result column="coord_y" property="coordY" jdbcType="INTEGER" />
+    <result column="azimuth" property="azimuth" jdbcType="VARCHAR" />
+    <result column="lac_name" property="lacName" jdbcType="VARCHAR" />
+    <result column="coverarea" property="coverarea" jdbcType="VARCHAR" />
+    <result column="street" property="street" jdbcType="VARCHAR" />
+    <result column="lac" property="lac" jdbcType="VARCHAR" />
+    <result column="ci" property="ci" jdbcType="VARCHAR" />
+  </resultMap>
+</mapper>

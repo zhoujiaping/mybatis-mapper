@@ -1,0 +1,393 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"><mapper namespace="cn.howso.deeplan.psi.commons.dao.AreaResMapper"><resultMap id="BaseResultMap" type="cn.howso.deeplan.psi.commons.model.AreaRes"><id column="id" property="id" jdbcType="INTEGER"/><result column="amount" property="amount" jdbcType="INTEGER"/><result column="time" property="time" jdbcType="VARCHAR"/><result column="province" property="province" jdbcType="VARCHAR"/><result column="city" property="city" jdbcType="VARCHAR"/><result column="grain" property="grain" jdbcType="VARCHAR"/><result column="area_id" property="areaId" jdbcType="INTEGER"/></resultMap><select id="queryAmountFromCountry" parameterType="object" resultMap="BaseResultMap">
+  	select sum(t1.amount) as amount from sy_area_res t1
+  	inner join sy_area t2
+  	on t1.area_id=t2.id
+  	and t2.name=#{qry.areaName}
+  	where t1.time=#{qry.time}
+  	and t1.province is not null
+  	and t1.city is null
+  	and t1.grain=#{qry.grain}
+  </select><select id="queryAmountFromCitiesByPage" parameterType="map" resultMap="BaseResultMap">
+  	select t1.id,amount,time,province,city,grain,area_id from sy_area_res t1
+  	inner join sy_area t2
+  	on t1.area_id=t2.id
+  	and t2.name=#{qry.areaName}
+  	where t1.time=#{qry.time}
+  	and t1.province=#{qry.parentRegionName}
+  	and t1.city is not null
+  	and grain=#{qry.grain}
+  	<if test="qry.excludeRegionNameList !=null">
+  	and t1.city not in
+  		<foreach collection="qry.excludeRegionNameList" item="excludeRegionName" open="(" close=")" separator=",">
+	  		#{excludeRegionName}
+  		</foreach>
+  	</if>
+  	<if test="sort != null and order != null">
+  		order by ${sort} ${order}
+  	</if>
+  </select><select id="queryAmountFromProvincesByPage" parameterType="map" resultMap="BaseResultMap">
+  	select t1.id,amount,time,province,city,grain,area_id from sy_area_res t1
+  	inner join sy_area t2
+  	on t1.area_id=t2.id
+  	and t2.name=#{qry.areaName}
+  	where t1.time=#{qry.time}
+  	and t1.province is not null
+  	and t1.city is null
+  	and grain=#{qry.grain}
+  	<if test="qry.excludeRegionNameList !=null">
+  	and t1.province not in
+  		<foreach collection="qry.excludeRegionNameList" item="excludeRegionName" index="" open="(" close=")" separator=",">
+	  		#{excludeRegionName}
+  		</foreach>
+  	</if>
+  	<if test="sort != null and order != null">
+  		order by ${sort} ${order}
+  	</if>
+  </select><select id="queryTrendFromCountry" parameterType="map" resultMap="BaseResultMap">
+  	select sum(amount) as amount,time from sy_area_res t1
+  	inner join sy_area t2
+  	on t1.area_id=t2.id
+  	and t2.name=#{qry.areaName}
+  	where t1.time like #{qry.time}||'%'
+  	and t1.province is not null
+  	and t1.city is null
+  	and grain=#{qry.grain}
+  	group by time
+  	order by time asc
+  </select><select id="queryTrendFromProvince" parameterType="map" resultMap="BaseResultMap">
+  	select t1.id,amount,time from sy_area_res t1
+  	inner join sy_area t2
+  	on t1.area_id=t2.id
+  	and t2.name=#{qry.areaName}
+  	where t1.time like #{qry.time}||'%'
+  	and t1.province = #{qry.regionName}
+  	and t1.city is null
+  	and grain=#{qry.grain}
+  	order by time asc
+  </select><select id="queryLastDataTime" resultType="string">
+  	select max(time) as time from sy_area_res;
+  </select><select id="selectByExample" resultMap="BaseResultMap" parameterType="object">
+select
+<if test="distinct">
+distinct
+</if>
+'false' as QUERYID,
+amount,province,city,id,time,grain,area_id
+from sy_area_res
+<if test="_parameter != null">
+<where>
+<foreach collection="oredCriteria" item="criteria" separator="or">
+<if test="criteria.valid">
+<trim prefix="(" prefixOverrides="and" suffix=")">
+<foreach collection="criteria.criteria" item="criterion">
+<choose>
+<when test="criterion.noValue">
+and ${criterion.condition}
+</when>
+<when test="criterion.singleValue">
+and ${criterion.condition} #{criterion.value}
+</when>
+<when test="criterion.betweenValue">
+and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+</when>
+<when test="criterion.listValue">
+and ${criterion.condition}
+<foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+#{listItem}
+</foreach>
+</when>
+</choose>
+</foreach>
+</trim>
+</if>
+</foreach>
+</where>
+</if>
+<if test="orderByClause != null">
+order by ${orderByClause}
+</if>
+</select><insert id="batchInsertSelective" parameterType="map">
+insert into sy_area_res
+<trim prefix="(" suffix=")" suffixOverrides=",">
+<if test="recordList[0].id != null">id,</if>
+<if test="recordList[0].amount != null">amount,</if>
+<if test="recordList[0].time != null">time,</if>
+<if test="recordList[0].province != null">province,</if>
+<if test="recordList[0].city != null">city,</if>
+<if test="recordList[0].grain != null">grain,</if>
+<if test="recordList[0].areaId != null">area_id,</if>
+</trim>
+values
+<foreach collection="recordList" item="record" separator=",">
+<trim prefix="(" suffix=")" suffixOverrides=",">
+<if test="record.id != null">#{record.id,jdbcType=INTEGER},</if>
+<if test="record.amount != null">#{record.amount,jdbcType=INTEGER},</if>
+<if test="record.time != null">#{record.time,jdbcType=VARCHAR},</if>
+<if test="record.province != null">#{record.province,jdbcType=VARCHAR},</if>
+<if test="record.city != null">#{record.city,jdbcType=VARCHAR},</if>
+<if test="record.grain != null">#{record.grain,jdbcType=VARCHAR},</if>
+<if test="record.areaId != null">#{record.areaId,jdbcType=INTEGER},</if>
+</trim>
+</foreach>
+</insert><insert id="insertSelective" parameterType="object">
+insert into sy_area_res
+<trim prefix="(" suffix=")" suffixOverrides=",">
+<if test="id != null">id,</if>
+<if test="amount != null">amount,</if>
+<if test="time != null">time,</if>
+<if test="province != null">province,</if>
+<if test="city != null">city,</if>
+<if test="grain != null">grain,</if>
+<if test="areaId != null">area_id,</if>
+</trim>
+<trim prefix="values (" suffix=")" suffixOverrides=",">
+<if test="id != null">#{id,jdbcType=INTEGER},</if>
+<if test="amount != null">#{amount,jdbcType=INTEGER},</if>
+<if test="time != null">#{time,jdbcType=VARCHAR},</if>
+<if test="province != null">#{province,jdbcType=VARCHAR},</if>
+<if test="city != null">#{city,jdbcType=VARCHAR},</if>
+<if test="grain != null">#{grain,jdbcType=VARCHAR},</if>
+<if test="areaId != null">#{areaId,jdbcType=INTEGER},</if>
+</trim>
+</insert><select id="countByExample" parameterType="object" resultType="java.lang.Integer">
+select count(*) from sy_area_res
+<if test="_parameter != null">
+<where>
+<foreach collection="oredCriteria" item="criteria" separator="or">
+<if test="criteria.valid">
+<trim prefix="(" prefixOverrides="and" suffix=")">
+<foreach collection="criteria.criteria" item="criterion">
+<choose>
+<when test="criterion.noValue">
+and ${criterion.condition}
+</when>
+<when test="criterion.singleValue">
+and ${criterion.condition} #{criterion.value}
+</when>
+<when test="criterion.betweenValue">
+and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+</when>
+<when test="criterion.listValue">
+and ${criterion.condition}
+<foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+#{listItem}
+</foreach>
+</when>
+</choose>
+</foreach>
+</trim>
+</if>
+</foreach>
+</where>
+</if>
+</select><insert id="batchInsert" parameterType="map">
+insert into sy_area_res
+(id,amount,time,province,city,grain,area_id)
+values
+<foreach collection="recordList" item="record" separator=",">
+(#{record.id,jdbcType=INTEGER},#{record.amount,jdbcType=INTEGER},#{record.time,jdbcType=VARCHAR},#{record.province,jdbcType=VARCHAR},#{record.city,jdbcType=VARCHAR},#{record.grain,jdbcType=VARCHAR},#{record.areaId,jdbcType=INTEGER})
+</foreach>
+</insert><update id="updateByPrimaryKeySelective" parameterType="object">
+update sy_area_res
+<set>
+<if test="amount != null">amount = #{amount,jdbcType=INTEGER},</if>
+<if test="time != null">time = #{time,jdbcType=VARCHAR},</if>
+<if test="province != null">province = #{province,jdbcType=VARCHAR},</if>
+<if test="city != null">city = #{city,jdbcType=VARCHAR},</if>
+<if test="grain != null">grain = #{grain,jdbcType=VARCHAR},</if>
+<if test="areaId != null">area_id = #{areaId,jdbcType=INTEGER},</if>
+</set>
+where id=#{id,jdbcType=INTEGER}
+</update><insert id="insert" parameterType="object">
+insert into sy_area_res
+(id,amount,time,province,city,grain,area_id)
+values 
+(#{id,jdbcType=INTEGER},#{amount,jdbcType=INTEGER},#{time,jdbcType=VARCHAR},#{province,jdbcType=VARCHAR},#{city,jdbcType=VARCHAR},#{grain,jdbcType=VARCHAR},#{areaId,jdbcType=INTEGER})
+</insert><update id="updateByExample" parameterType="map">
+update sy_area_res
+ set 
+id = #{record.id,jdbcType=INTEGER},
+amount = #{record.amount,jdbcType=INTEGER},
+time = #{record.time,jdbcType=VARCHAR},
+province = #{record.province,jdbcType=VARCHAR},
+city = #{record.city,jdbcType=VARCHAR},
+grain = #{record.grain,jdbcType=VARCHAR},
+area_id = #{record.areaId,jdbcType=INTEGER}
+ <if test="_parameter != null">
+<where>
+<foreach collection="example.oredCriteria" item="criteria" separator="or">
+<if test="criteria.valid">
+<trim prefix="(" prefixOverrides="and" suffix=")">
+<foreach collection="criteria.criteria" item="criterion">
+<choose>
+<when test="criterion.noValue">
+and ${criterion.condition}
+</when>
+<when test="criterion.singleValue">
+and ${criterion.condition} #{criterion.value}
+</when>
+<when test="criterion.betweenValue">
+and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+</when>
+<when test="criterion.listValue">
+and ${criterion.condition}
+<foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+#{listItem}
+</foreach>
+</when>
+</choose>
+</foreach>
+</trim>
+</if>
+</foreach>
+</where>
+</if>
+</update><select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="map">
+select
+amount,province,city,id,time,grain,area_id
+from sy_area_res
+where id=#{id,jdbcType=INTEGER}
+</select><update id="updateByExampleSelective" parameterType="map">
+update sy_area_res
+<set>
+<if test="record.id != null">id=#{record.id,jdbcType=INTEGER},</if>
+<if test="record.amount != null">amount=#{record.amount,jdbcType=INTEGER},</if>
+<if test="record.time != null">time=#{record.time,jdbcType=VARCHAR},</if>
+<if test="record.province != null">province=#{record.province,jdbcType=VARCHAR},</if>
+<if test="record.city != null">city=#{record.city,jdbcType=VARCHAR},</if>
+<if test="record.grain != null">grain=#{record.grain,jdbcType=VARCHAR},</if>
+<if test="record.areaId != null">area_id=#{record.areaId,jdbcType=INTEGER},</if>
+</set>
+<if test="_parameter != null">
+<where>
+<foreach collection="example.oredCriteria" item="criteria" separator="or">
+<if test="criteria.valid">
+<trim prefix="(" prefixOverrides="and" suffix=")">
+<foreach collection="criteria.criteria" item="criterion">
+<choose>
+<when test="criterion.noValue">
+and ${criterion.condition}
+</when>
+<when test="criterion.singleValue">
+and ${criterion.condition} #{criterion.value}
+</when>
+<when test="criterion.betweenValue">
+and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+</when>
+<when test="criterion.listValue">
+and ${criterion.condition}
+<foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+#{listItem}
+</foreach>
+</when>
+</choose>
+</foreach>
+</trim>
+</if>
+</foreach>
+</where>
+</if>
+</update><delete id="deleteByExample" parameterType="object">
+delete from sy_area_res
+<if test="_parameter != null">
+<where>
+<foreach collection="oredCriteria" item="criteria" separator="or">
+<if test="criteria.valid">
+<trim prefix="(" prefixOverrides="and" suffix=")">
+<foreach collection="criteria.criteria" item="criterion">
+<choose>
+<when test="criterion.noValue">
+and ${criterion.condition}
+</when>
+<when test="criterion.singleValue">
+and ${criterion.condition} #{criterion.value}
+</when>
+<when test="criterion.betweenValue">
+and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+</when>
+<when test="criterion.listValue">
+and ${criterion.condition}
+<foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+#{listItem}
+</foreach>
+</when>
+</choose>
+</foreach>
+</trim>
+</if>
+</foreach>
+</where>
+</if>
+</delete><select id="selectByExampleByPage" resultMap="BaseResultMap" parameterType="map">
+select
+<if test="example.distinct">
+distinct
+</if>
+'false' as QUERYID,
+amount,province,city,id,time,grain,area_id
+from sy_area_res
+<if test="_parameter != null">
+<where>
+<foreach collection="example.oredCriteria" item="criteria" separator="or">
+<if test="criteria.valid">
+<trim prefix="(" prefixOverrides="and" suffix=")">
+<foreach collection="criteria.criteria" item="criterion">
+<choose>
+<when test="criterion.noValue">
+and ${criterion.condition}
+</when>
+<when test="criterion.singleValue">
+and ${criterion.condition} #{criterion.value}
+</when>
+<when test="criterion.betweenValue">
+and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+</when>
+<when test="criterion.listValue">
+and ${criterion.condition}
+<foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+#{listItem}
+</foreach>
+</when>
+</choose>
+</foreach>
+</trim>
+</if>
+</foreach>
+</where>
+</if>
+<if test="example.orderByClause != null">
+order by ${example.orderByClause}
+</if>
+</select><update id="updateByPrimaryKey" parameterType="object">
+update sy_area_res
+ set 
+id = #{id,jdbcType=INTEGER},amount = #{amount,jdbcType=INTEGER},time = #{time,jdbcType=VARCHAR},province = #{province,jdbcType=VARCHAR},city = #{city,jdbcType=VARCHAR},grain = #{grain,jdbcType=VARCHAR},area_id = #{areaId,jdbcType=INTEGER}
+where id=#{id,jdbcType=INTEGER}
+</update><delete id="deleteByPrimaryKey" parameterType="map">
+delete from sy_area_res
+where id= #{id,jdbcType=INTEGER}
+</delete><insert id="insertSelectiveSelectKey" parameterType="object">
+<selectKey keyProperty="id" resultType="java.lang.Integer" order="BEFORE">
+select nextval('sy_area_res_id_seq')
+</selectKey>
+insert into sy_area_res
+<trim prefix="(" suffix=")" suffixOverrides=",">
+<if test="id != null">id,</if>
+<if test="amount != null">amount,</if>
+<if test="time != null">time,</if>
+<if test="province != null">province,</if>
+<if test="city != null">city,</if>
+<if test="grain != null">grain,</if>
+<if test="areaId != null">area_id,</if>
+</trim>
+<trim prefix="values (" suffix=")" suffixOverrides=",">
+<if test="id != null">#{id,jdbcType=INTEGER},</if>
+<if test="amount != null">#{amount,jdbcType=INTEGER},</if>
+<if test="time != null">#{time,jdbcType=VARCHAR},</if>
+<if test="province != null">#{province,jdbcType=VARCHAR},</if>
+<if test="city != null">#{city,jdbcType=VARCHAR},</if>
+<if test="grain != null">#{grain,jdbcType=VARCHAR},</if>
+<if test="areaId != null">#{areaId,jdbcType=INTEGER},</if>
+</trim>
+</insert></mapper>
