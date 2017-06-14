@@ -13,6 +13,6 @@ public class MapperMakerTest {
         long begin = System.currentTimeMillis();
         m.make();
         long end = System.currentTimeMillis();
-        System.out.println(end - begin);// 并行：1216，串行：6065
+        //System.out.println(end - begin);// 并行：1216，串行：6065
     }
 }

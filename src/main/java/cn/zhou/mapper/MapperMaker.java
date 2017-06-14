@@ -1,5 +1,7 @@
 package cn.zhou.mapper;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -82,12 +84,12 @@ public class MapperMaker {
             IllegalArgumentException, InvocationTargetException, InstantiationException, DocumentException {
         String filename = file.getName().replace(replaceFrom, replaceTo);
         File newFile = new File(file.getParent(), filename);
-        if (newFile.exists()) {
+        /*if (newFile.exists()) {
             logger.info(String.format("ignore file %s", newFile.getName()));
             return;
-        }
-        InputStream in = new FileInputStream(file);
-        FileWriter out = new FileWriter(newFile);
+        }*/
+        InputStream in = new BufferedInputStream(new FileInputStream(file));
+        Writer out = new BufferedWriter(new FileWriter(newFile));
         merge(in, out);
         out.close();
         in.close();
@@ -98,14 +100,17 @@ public class MapperMaker {
             throws DocumentException, ClassNotFoundException, IllegalAccessException, IllegalArgumentException,
             InvocationTargetException, InstantiationException, IOException {
         // conf
+    	 long begin = System.currentTimeMillis();
         final MapperConf conf = new MapperConf();
         SAXReader reader = new SAXReader();
         Document doc = reader.read(inputStream);
+        long end = System.currentTimeMillis();
+        System.out.println(end - begin);// 并行：1216，串行：6065
         Element root = doc.getRootElement();
-        Attribute attr = root.attribute("namespace");// mapper类名
+        Attribute attr = root.attribute("namespace");// mapper绫诲悕
         String ns = attr.getStringValue();
         Class<?> mapperClazz = Class.forName(ns);
-        Table tableAnno = mapperClazz.getAnnotation(Table.class);// 根据注解获取表名
+        Table tableAnno = mapperClazz.getAnnotation(Table.class);// 鏍规嵁娉ㄨВ鑾峰彇琛ㄥ悕
         if (tableAnno == null) {
             doc.write(writer);
             return;
@@ -128,7 +133,7 @@ public class MapperMaker {
                 conf.setIdResMap(idResMap);
             }
             List<Element> mappings = baseResultMap.elements();
-            List<ResMap> resMaps = mappings.stream().map(x -> {// 从BaseResultMap获取字段映射
+            List<ResMap> resMaps = mappings.stream().map(x -> {// 浠嶣aseResultMap鑾峰彇瀛楁鏄犲皠
                 ResMap resMap = new ResMap();
                 resMap.setColumn(x.attribute("column").getStringValue());
                 resMap.setJdbcType(x.attribute("jdbcType").getStringValue());
@@ -137,10 +142,11 @@ public class MapperMaker {
             }).collect(Collectors.toList());
             conf.setResMaps(resMaps);
         } else {
-            throw new RuntimeException("未定义BaseResultMap");
+            throw new RuntimeException("鏈畾涔塀aseResultMap");
         }
         conf.setNamespace(ns);
         conf.setTablename(tablename);
+       
         // write
         Type[] types = mapperClazz.getGenericInterfaces();
         Map<Type, ParameterizedType> ptMap = new HashMap<>();
@@ -150,7 +156,7 @@ public class MapperMaker {
                 ptMap.put(pt.getRawType(), pt);
             }
         }
-        Set<String> methods = new HashSet<>();// 获取泛型接口的方法
+        Set<String> methods = new HashSet<>();// 鑾峰彇娉涘瀷鎺ュ彛鐨勬柟娉�
         if (ptMap.get(BaseMapper.class) != null) {
             String idType = ptMap.get(BaseMapper.class).getActualTypeArguments()[2].getTypeName();
             conf.setIdType(idType);
@@ -177,13 +183,13 @@ public class MapperMaker {
             providerMethodMap.put(m.getName(), m);
         }
         List<Element> eleList = root.elements();
-        Map<String, Element> idEleMap = new HashMap<>();// mapper.xml已经配置的标签
+        Map<String, Element> idEleMap = new HashMap<>();// mapper.xml宸茬粡閰嶇疆鐨勬爣绛�
         for (Element ele : eleList) {
             String id = ele.attribute("id").getStringValue();
             idEleMap.put(id, ele);
         }
-        for (String m : methods) {// 对泛型接口每一个方法，调用provider的同名方法，生成标签，插入到xml。
-            if (idEleMap.get(m) == null) {// mapper.xml配置的sql优先级高
+        for (String m : methods) {// 瀵规硾鍨嬫帴鍙ｆ瘡涓�涓柟娉曪紝璋冪敤provider鐨勫悓鍚嶆柟娉曪紝鐢熸垚鏍囩锛屾彃鍏ュ埌xml銆�
+            if (idEleMap.get(m) == null) {// mapper.xml閰嶇疆鐨剆ql浼樺厛绾ч珮
                 Method method = providerMethodMap.get(m);
                 String sqlTag = (String) method.invoke(provider, conf);
                 root.add(DocumentHelper.parseText(sqlTag).getRootElement());
