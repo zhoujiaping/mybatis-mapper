@@ -48,18 +48,22 @@ public class ExecutorPlugin implements Interceptor {
         int index = statementId.lastIndexOf(".");
         String methodName = statementId.substring(index + 1);
         if (("howso-" + methodName).equals(sql)) {// 只有第一次会执行，因为执行一次后sql语句已经被改变。
-            String mapperClazzName = statementId.substring(0, index);
-            ScriptSqlProvider provider = new ScriptSqlProvider();
-            Method method = providerMethodMap.get(methodName);
-            String script = (String) method.invoke(provider, XMLMapperConf.of(configuration, mapperClazzName));
-            // 不支持写<selectKey>，不支持<include>
-            // "<script>select * from sys_user <where> 1=1</where>order by #{orderByClause}</script>";
-            Class<?> paramClazz = parameterObject==null?null:parameterObject.getClass();
-            SqlSource dynamicSqlSource = new XMLLanguageDriver().createSqlSource(configuration, script,
-                    paramClazz);
-            String msg = "sql for %s is %s,replaced by\r\n%s";
-            logger.debug(String.format(msg, statementId,sql,script));
-            ReflectHelper.setValueByFieldName(statement, "sqlSource", dynamicSqlSource);
+            synchronized(this){
+                if (("howso-" + methodName).equals(sql)) {
+                    String mapperClazzName = statementId.substring(0, index);
+                    ScriptSqlProvider provider = new ScriptSqlProvider();
+                    Method method = providerMethodMap.get(methodName);
+                    String script = (String) method.invoke(provider, XMLMapperConf.of(configuration, mapperClazzName));
+                    // 不支持写<selectKey>，不支持<include>
+                    // "<script>select * from sys_user <where> 1=1</where>order by #{orderByClause}</script>";
+                    Class<?> paramClazz = parameterObject==null?null:parameterObject.getClass();
+                    SqlSource dynamicSqlSource = new XMLLanguageDriver().createSqlSource(configuration, script,
+                            paramClazz);
+                    String msg = "sql for %s is %s,replaced by\r\n%s";
+                    logger.debug(String.format(msg, statementId,sql,script));
+                    ReflectHelper.setValueByFieldName(statement, "sqlSource", dynamicSqlSource);
+                }
+            }
         }
         Object ret = invocation.proceed();
         return ret;
