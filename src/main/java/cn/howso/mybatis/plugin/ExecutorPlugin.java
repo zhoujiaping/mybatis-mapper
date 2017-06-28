@@ -42,7 +42,7 @@ public class ExecutorPlugin implements Interceptor {
         MappedStatement statement = (MappedStatement) args[0];
         Configuration configuration = statement.getConfiguration();
         Object parameterObject = args[1];
-        statement.getSqlSource().getBoundSql(parameterObject);
+        //statement.getSqlSource().getBoundSql(parameterObject);
         String sql = statement.getBoundSql(parameterObject).getSql();
         String statementId = statement.getId();
         int index = statementId.lastIndexOf(".");
