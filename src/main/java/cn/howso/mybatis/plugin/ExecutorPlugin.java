@@ -28,7 +28,7 @@ import cn.howso.mybatis.util.XMLMapperConf;
                 RowBounds.class, ResultHandler.class }),
         @Signature(type = Executor.class, method = "update", args = {MappedStatement.class, Object.class }) })
 public class ExecutorPlugin implements Interceptor {
-    private static final Logger logger = Logger.getLogger(ExecutorPlugin.class);
+    //private static final Logger logger = Logger.getLogger(ExecutorPlugin.class);
     private static final Map<String, Method> providerMethodMap = new HashMap<>();
     static {
         Method[] methods = ScriptSqlProvider.class.getMethods();
@@ -60,7 +60,7 @@ public class ExecutorPlugin implements Interceptor {
                     SqlSource dynamicSqlSource = new XMLLanguageDriver().createSqlSource(configuration, script,
                             paramClazz);
                     String msg = "sql for %s is %s,replaced by\r\n%s";
-                    logger.debug(String.format(msg, statementId,sql,script));
+                    //logger.debug(String.format(msg, statementId,sql,script));
                     ReflectHelper.setValueByFieldName(statement, "sqlSource", dynamicSqlSource);
                 }
             }
