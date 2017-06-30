@@ -3,7 +3,9 @@ create table sys_user(
 id serial8 primary key,
 name varchar,
 nick varchar,
-password varchar
+password varchar,
+create_time timestamp,
+status int4
 );
 insert into sys_user(name,nick,password)values
 ('zhoujiaping','chengxuyuan','123456'),
