@@ -23,14 +23,6 @@ import org.apache.ibatis.plugin.Signature;
 import cn.howso.mybatis.model.Pageable;
 import cn.howso.mybatis.util.ReflectHelper;
 
-/**
- * <p>
- * mybatis的分页插件
- * </p>
- * 
- * @author wzf
- * @date 2016年3月15日 上午9:44:22
- */
 @Intercepts({@Signature(type = StatementHandler.class, method = "prepare", args = {Connection.class}) })
 public class PagePlugin implements Interceptor {
 
