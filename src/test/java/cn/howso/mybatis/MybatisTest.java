@@ -11,10 +11,7 @@ import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.defaults.DefaultSqlSessionFactory;
-import org.junit.AfterClass;
 import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
 
 import cn.howso.mybatis.mapper.UserMapper;
 import cn.howso.mybatis.model.IndexPage;
