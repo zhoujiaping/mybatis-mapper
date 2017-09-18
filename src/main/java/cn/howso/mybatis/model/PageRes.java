@@ -26,5 +26,11 @@ public class PageRes<T> {
     public void setRows(List<T> rows) {
         this.rows = rows;
     }
+    public static <T> PageRes<T> of(int size, List<T> rows) {
+        PageRes<T> pageRes = new PageRes<>();
+        pageRes.total = size;
+        pageRes.setRows(rows);
+        return pageRes;
+    }
     
 }
