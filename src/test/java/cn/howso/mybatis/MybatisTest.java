@@ -14,10 +14,10 @@ import org.apache.ibatis.session.defaults.DefaultSqlSessionFactory;
 import org.junit.Assert;
 
 import cn.howso.mybatis.mapper.UserMapper;
+import cn.howso.mybatis.model.Example;
 import cn.howso.mybatis.model.IndexPage;
 import cn.howso.mybatis.model.PageRes;
 import cn.howso.mybatis.model.User;
-import cn.howso.mybatis.model.UserExample;
 
 public class MybatisTest {
 
@@ -44,8 +44,8 @@ public class MybatisTest {
     public void testCountByExample() {
         SqlSession session = sqlSessionFactory.openSession();
         UserMapper userMapper = session.getMapper(UserMapper.class);
-        UserExample example = new UserExample();
-        example.createCriteria().andNameLike("%avril%");
+        Example example = new Example();
+        example.createCriteria().and("name").like("%avril%");
         int count = userMapper.countByExample(example);
         Assert.assertEquals(count, 1);
         // session.commit();不提交，使得每个测试单独不影响
@@ -57,8 +57,8 @@ public class MybatisTest {
     public void deleteByExample() {
         SqlSession session = sqlSessionFactory.openSession();
         UserMapper userMapper = session.getMapper(UserMapper.class);
-        UserExample example = new UserExample();
-        example.createCriteria().andNameLike("%avril%");
+        Example example = new Example();
+        example.createCriteria().and("name").like("%avril%");
         int count = userMapper.deleteByExample(example);
         Assert.assertEquals(count, 1);
         session.rollback();
@@ -95,8 +95,8 @@ public class MybatisTest {
     public void selectByExample() {
         SqlSession session = sqlSessionFactory.openSession();
         UserMapper userMapper = session.getMapper(UserMapper.class);
-        UserExample example = new UserExample();
-        example.createCriteria().andNameLike("%avril%");
+        Example example = new Example();
+        example.createCriteria().and("name").like("%avril%");
         List<User> users = userMapper.selectByExample(example);
         Assert.assertEquals(users.size(), 1);
         session.rollback();
@@ -107,8 +107,8 @@ public class MybatisTest {
     public void updateByExampleSelective() {
         SqlSession session = sqlSessionFactory.openSession();
         UserMapper userMapper = session.getMapper(UserMapper.class);
-        UserExample example = new UserExample();
-        example.createCriteria().andNameLike("%avril%");
+        Example example = new Example();
+        example.createCriteria().and("name").like("%avril%");
         User record = new User();
         record.setName("xiaodao");
         int count = userMapper.updateByExampleSelective(record,example);
@@ -121,8 +121,8 @@ public class MybatisTest {
     public void updateByExample() {
         SqlSession session = sqlSessionFactory.openSession();
         UserMapper userMapper = session.getMapper(UserMapper.class);
-        UserExample example = new UserExample();
-        example.createCriteria().andNameLike("%avril%");
+        Example example = new Example();
+        example.createCriteria().and("name").like("%avril%");
         User record = new User();
         record.setId(-2L);
         record.setName("xiaodao");
@@ -136,8 +136,8 @@ public class MybatisTest {
     public void selectByExampleByPage() {
         SqlSession session = sqlSessionFactory.openSession();
         UserMapper userMapper = session.getMapper(UserMapper.class);
-        UserExample example = new UserExample();
-        example.createCriteria().andNameNotLike("%avril%");
+        Example example = new Example();
+        example.createCriteria().and("name").notLike("%avril%");
         IndexPage page = IndexPage.of(1, 3);
         List<User> rows = userMapper.selectByExampleByPage(example,page);
         PageRes<User> pageRes = PageRes.of(page, rows);
