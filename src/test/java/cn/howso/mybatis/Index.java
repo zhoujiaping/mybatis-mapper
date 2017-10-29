@@ -27,7 +27,7 @@ public class Index {
         System.out.println(user.getName());
         //基于Mapper的接口
         UserMapper userMapper = session.getMapper(UserMapper.class);
-        User user2 = userMapper.selectByPrimaryKey(1L);
+        User user2 = userMapper.selectByPrimaryKey(1);
         System.out.println(user2.getName());
     }
 }

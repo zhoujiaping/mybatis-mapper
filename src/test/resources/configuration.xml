@@ -21,6 +21,7 @@ PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
 			<property name="dialect" value="postgre" />
 			<property name="pageSqlId" value=".*ByPage.*" />
 		</plugin>
+		<!-- <plugin interceptor="cn.howso.mybatis.plugin.MyResultSetHandlerPlugin"></plugin> -->
 		<!-- <plugin interceptor="cn.howso.framework.mybatis.StatementHandlerPlugin"> 
 			<property name="someProperty" value="100" /> </plugin> -->
 	</plugins>

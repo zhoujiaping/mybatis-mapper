@@ -17,19 +17,19 @@ import cn.howso.mybatis.model.Pageable;
  */
 public interface BaseMapper<ENTITY, EXAMPLE, PK>{
 
-    @ResultType(Long.class)
+    @ResultType(Integer.class)
     @Select("howso-countByExample")
     int countByExample(EXAMPLE example);
 
-    @ResultType(Long.class)
+    @ResultType(Integer.class)
     @Delete("howso-deleteByExample")
     int deleteByExample(EXAMPLE example);
 
-    @ResultType(Long.class)
+    @ResultType(Integer.class)
     @Insert("howso-insert")
     int insert(ENTITY record);
 
-    @ResultType(Long.class)
+    @ResultType(Integer.class)
     @Insert("howso-insertSelective")
     int insertSelective(ENTITY record);
 
@@ -37,11 +37,11 @@ public interface BaseMapper<ENTITY, EXAMPLE, PK>{
     @Select("howso-selectByExample")
     List<ENTITY> selectByExample(EXAMPLE example);
 
-    @ResultType(Long.class)
+    @ResultType(Integer.class)
     @Update("howso-updateByExampleSelective")
     int updateByExampleSelective(@Param("record") ENTITY record, @Param("example") EXAMPLE example);
 
-    @ResultType(Long.class)
+    @ResultType(Integer.class)
     @Update("howso-updateByExample")
     int updateByExample(@Param("record") ENTITY record, @Param("example") EXAMPLE example);
 
@@ -49,15 +49,15 @@ public interface BaseMapper<ENTITY, EXAMPLE, PK>{
     @Select("howso-selectByExampleByPage")
     List<ENTITY> selectByExampleByPage(@Param("example") EXAMPLE example, @Param("page") Pageable page);
 
-    @ResultType(Long.class)
+    @ResultType(Integer.class)
     @Insert("howso-batchInsert")
     int batchInsert(@Param("recordList") List<ENTITY> recordList);
 
-    @ResultType(Long.class)
+    @ResultType(Integer.class)
     @Insert("howso-batchInsertSelective")
     int batchInsertSelective(@Param("recordList") List<ENTITY> recordList);
 
-    @ResultType(Long.class)
+    @ResultType(Integer.class)
     @Delete("howso-deleteByPrimaryKey")
     int deleteByPrimaryKey(@Param("id") PK id);// @Param("id")不要删除，约定名称为传参名为id，这样简单方便。
 
@@ -65,16 +65,16 @@ public interface BaseMapper<ENTITY, EXAMPLE, PK>{
     @Select("howso-selectByPrimaryKey")
     ENTITY selectByPrimaryKey(@Param("id") PK id);// @Param("id")不要删除，约定名称为传参名为id，这样简单方便。
 
-    @ResultType(Long.class)
+    @ResultType(Integer.class)
     @Update("howso-updateByPrimaryKeySelective")
     int updateByPrimaryKeySelective(ENTITY record);
 
-    @ResultType(Long.class)
+    @ResultType(Integer.class)
     @Update("howso-updateByPrimaryKey")
     int updateByPrimaryKey(ENTITY record);
 
-    /*@ResultType(Long.class)
-    @SelectKey(before=true,keyColumn="id",resultType=Long.class,statement="select nextVal('sys_user_id_seq')", keyProperty = "id")
+    /*@ResultType(Integer.class)
+    @SelectKey(before=true,keyColumn="id",resultType=Integer.class,statement="select nextVal('sys_user_id_seq')", keyProperty = "id")
     @Insert("howso-insertSelectiveSelectKey")
     int insertSelectiveSelectKey(ENTITY record);*/
     /**

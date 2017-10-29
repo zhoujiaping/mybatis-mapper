@@ -4,14 +4,20 @@ import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.ibatis.builder.xml.XMLConfigBuilder;
 import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.session.Configuration;
+import org.apache.ibatis.session.ResultContext;
+import org.apache.ibatis.session.ResultHandler;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.defaults.DefaultSqlSessionFactory;
+import org.junit.AfterClass;
 import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 import cn.howso.mybatis.mapper.UserMapper;
 import cn.howso.mybatis.model.Example;
@@ -24,23 +30,23 @@ public class MybatisTest {
     private static String resource = "configuration.xml";
     private static SqlSessionFactory sqlSessionFactory;
 
-    //@BeforeClass
+    @BeforeClass
     public static void beforeClass() throws IOException {
         /*
          * 1、建库，执行init-test.sql 2、执行mybatis-generator:generate，拷贝文件到项目对应位置 3、执行测试
          */
         Reader reader = Resources.getResourceAsReader(resource);
-        XMLConfigBuilder xMLConfigBuilder = new XMLConfigBuilder(reader);
-        Configuration configuration = xMLConfigBuilder.parse();
+        XMLConfigBuilder xMConfigBuilder = new XMLConfigBuilder(reader);
+        Configuration configuration = xMConfigBuilder.parse();
         sqlSessionFactory = new DefaultSqlSessionFactory(configuration);
         // SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(reader);
     }
 
-    //@AfterClass
+    @AfterClass
     public static void afterClass() {
     }
 
-    //@Test
+    @Test
     public void testCountByExample() {
         SqlSession session = sqlSessionFactory.openSession();
         UserMapper userMapper = session.getMapper(UserMapper.class);
@@ -53,7 +59,7 @@ public class MybatisTest {
         session.close();
     }
 
-    //@Test
+    @Test
     public void deleteByExample() {
         SqlSession session = sqlSessionFactory.openSession();
         UserMapper userMapper = session.getMapper(UserMapper.class);
@@ -65,25 +71,26 @@ public class MybatisTest {
         session.close();
     }
 
-    //@Test
+    @Test
     public void insert() {
         SqlSession session = sqlSessionFactory.openSession();
         UserMapper userMapper = session.getMapper(UserMapper.class);
         User record = new User();
-        record.setId(-1L);
+        record.setId(-1);
         record.setName("xiaodao");
+        record.setPassword("123456");
         int count = userMapper.insert(record);
         Assert.assertEquals(count, 1);
         session.rollback();
         session.close();
     }
 
-    //@Test
+    @Test
     public void insertSelective() {
         SqlSession session = sqlSessionFactory.openSession();
         UserMapper userMapper = session.getMapper(UserMapper.class);
         User record = new User();
-        record.setId(-1L);
+        record.setId(-1);
         record.setName("xiaodao");
         int count = userMapper.insertSelective(record);
         Assert.assertEquals(count, 1);
@@ -91,19 +98,44 @@ public class MybatisTest {
         session.close();
     }
 
-    //@Test
+    @Test
     public void selectByExample() {
         SqlSession session = sqlSessionFactory.openSession();
         UserMapper userMapper = session.getMapper(UserMapper.class);
         Example example = new Example();
-        example.createCriteria().and("name").like("%avril%");
-        List<User> users = userMapper.selectByExample(example);
-        Assert.assertEquals(users.size(), 1);
+        List<User> users = new ArrayList<>();
+        ResultHandler<Map<String,Object>> handler = new ResultHandler<Map<String,Object>>() {
+			@Override
+			public void handleResult(ResultContext<? extends Map<String,Object>> resultContext) {
+				Map<String,Object> res = resultContext.getResultObject();
+				/*res.forEach(item->{
+					User user = new User();
+					user.setId((ong)item.get("id"));
+					user.setName((String)item.get("name"));
+					user.setNick((String)item.get("nick"));
+					user.setPassword((String)item.get("password"));
+					users.add(user);
+				});*/
+				User user = new User();
+				user.setId((Integer)res.get("id"));
+				user.setName((String)res.get("name"));
+				user.setNick((String)res.get("nick"));
+				user.setPassword((String)res.get("password"));
+				users.add(user);
+			}
+		};
+		List<?> haha = session.selectList("cn.howso.mybatis.mapper.UserMapper.test",example);
+		//session.select("cn.howso.mybatis.mapper.UserMapper.test",example, handler );
+		System.out.println(haha);
+		System.out.println(users);
+        example.createCriteria().and("name").like("%zhou%");
+        //ist<User> users = userMapper.selectByExample(example);
+        //Assert.assertEquals(users.size(), 1);
         session.rollback();
         session.close();
     }
 
-    //@Test
+    @Test
     public void updateByExampleSelective() {
         SqlSession session = sqlSessionFactory.openSession();
         UserMapper userMapper = session.getMapper(UserMapper.class);
@@ -117,14 +149,14 @@ public class MybatisTest {
         session.close();
     }
 
-    //@Test
+    @Test
     public void updateByExample() {
         SqlSession session = sqlSessionFactory.openSession();
         UserMapper userMapper = session.getMapper(UserMapper.class);
         Example example = new Example();
         example.createCriteria().and("name").like("%avril%");
         User record = new User();
-        record.setId(-2L);
+        record.setId(-2);
         record.setName("xiaodao");
         int count = userMapper.updateByExample(record,example);
         Assert.assertEquals(count, 1);
@@ -132,7 +164,7 @@ public class MybatisTest {
         session.close();
     }
 
-    //@Test
+    @Test
     public void selectByExampleByPage() {
         SqlSession session = sqlSessionFactory.openSession();
         UserMapper userMapper = session.getMapper(UserMapper.class);
@@ -147,73 +179,73 @@ public class MybatisTest {
         session.close();
     }
 
-    //@Test
+    @Test
     public void batchInsert() {
         SqlSession session = sqlSessionFactory.openSession();
         UserMapper userMapper = session.getMapper(UserMapper.class);
-        List<User> userList = new ArrayList<>();
+        List<User> userist = new ArrayList<>();
         User user1 = new User();
-        user1.setId(-1L);
+        user1.setId(-1);
         User user2 = new User();
-        user2.setId(-2L);
+        user2.setId(-2);
         User user3 = new User();
-        user3.setId(-3L);
-        userList.add(user1);
-        userList.add(user2);
-        userList.add(user3);
-        int count = userMapper.batchInsert(userList);
+        user3.setId(-3);
+        userist.add(user1);
+        userist.add(user2);
+        userist.add(user3);
+        int count = userMapper.batchInsert(userist);
         Assert.assertEquals(count, 3);
         session.rollback();
         session.close();
     }
 
-    //@Test
+    @Test
     public void batchInsertSelective() {
         SqlSession session = sqlSessionFactory.openSession();
         UserMapper userMapper = session.getMapper(UserMapper.class);
-        List<User> userList = new ArrayList<>();
+        List<User> userist = new ArrayList<>();
         User user1 = new User();
-        user1.setId(-1L);
+        user1.setId(-1);
         User user2 = new User();
-        user2.setId(-2L);
+        user2.setId(-2);
         User user3 = new User();
         user3.setNick("qiaofeng");
-        user3.setId(-3L);
-        userList.add(user1);
-        userList.add(user2);
-        userList.add(user3);
-        int count = userMapper.batchInsertSelective(userList);
+        user3.setId(-3);
+        userist.add(user1);
+        userist.add(user2);
+        userist.add(user3);
+        int count = userMapper.batchInsertSelective(userist);
         Assert.assertEquals(count, 3);
         session.rollback();
         session.close();
     }
-
-    //@Test
+    
+    @Test
     public void deleteByPrimaryKey() {
         SqlSession session = sqlSessionFactory.openSession();
         UserMapper userMapper = session.getMapper(UserMapper.class);
-        int count = userMapper.deleteByPrimaryKey(1L);
+        int count = userMapper.deleteByPrimaryKey(1);
         Assert.assertEquals(count, 1);
         session.rollback();
         session.close();
     }
 
-    //@Test
+    @Test
     public void selectByPrimaryKey() {
         SqlSession session = sqlSessionFactory.openSession();
         UserMapper userMapper = session.getMapper(UserMapper.class);
-        User user = userMapper.selectByPrimaryKey(1L);
-        Assert.assertEquals(user.getId().longValue(), 1L);
+        User user = userMapper.selectByPrimaryKey(1);
+        Assert.assertEquals(user.getId().longValue(), 1);
         session.rollback();
         session.close();
     }
 
-    //@Test
+    @Test
     public void updateByPrimaryKeySelective() {
         SqlSession session = sqlSessionFactory.openSession();
         UserMapper userMapper = session.getMapper(UserMapper.class);
         User user = new User();
-        user.setId(1L);
+        user.setId(1);
         user.setNick("fuck");
         int count = userMapper.updateByPrimaryKeySelective(user);
         Assert.assertEquals(count, 1);
@@ -221,12 +253,12 @@ public class MybatisTest {
         session.close();
     }
 
-    //@Test
+    @Test
     public void updateByPrimaryKey() {
         SqlSession session = sqlSessionFactory.openSession();
         UserMapper userMapper = session.getMapper(UserMapper.class);
         User user = new User();
-        user.setId(1L);
+        user.setId(1);
         user.setNick("fuck");
         int count = userMapper.updateByPrimaryKey(user);
         Assert.assertEquals(count, 1);
@@ -234,7 +266,7 @@ public class MybatisTest {
         session.close();
     }
 
-    /*//@Test
+    /*@Test
     public void insertSelectiveSelectKey() {
         SqlSession session = sqlSessionFactory.openSession();
         UserMapper userMapper = session.getMapper(UserMapper.class);
@@ -244,12 +276,12 @@ public class MybatisTest {
         Assert.assertEquals(count, 1);
         Assert.assertEquals(user.getId().intValue(), 6);
     }*/
-    //@Test
+    @Test
     public void selectKey() {
         SqlSession session = sqlSessionFactory.openSession();
         UserMapper userMapper = session.getMapper(UserMapper.class);
-        Long id = userMapper.selectKey();
-        Assert.assertTrue(id>5L);
+        Integer id = userMapper.selectKey();
+        Assert.assertTrue(id>5);
         session.rollback();
         session.close();
     }
