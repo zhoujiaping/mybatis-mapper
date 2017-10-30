@@ -11,6 +11,7 @@ PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
 		<setting name="useGeneratedKeys" value="false" />
 		<setting name="defaultExecutorType" value="SIMPLE" />
 		<setting name="defaultStatementTimeout" value="25000" />
+		<setting name="mapUnderscoreToCamelCase" value="true"/>
 	</settings>
 	<typeAliases>
 	</typeAliases>
@@ -21,9 +22,6 @@ PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
 			<property name="dialect" value="postgre" />
 			<property name="pageSqlId" value=".*ByPage.*" />
 		</plugin>
-		<!-- <plugin interceptor="cn.howso.mybatis.plugin.MyResultSetHandlerPlugin"></plugin> -->
-		<!-- <plugin interceptor="cn.howso.framework.mybatis.StatementHandlerPlugin"> 
-			<property name="someProperty" value="100" /> </plugin> -->
 	</plugins>
 	<environments default="development">
 		<environment id="development">

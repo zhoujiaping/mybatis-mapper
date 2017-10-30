@@ -8,6 +8,8 @@
     <result column="password" jdbcType="VARCHAR" property="password" />
   </resultMap>
   <select id="test" resultType="cn.howso.mybatis.model.User">
-  	select * from sys_user;
+  	select id,name,password,nick,'orange' as eye_color,-1 as "father.id",
+  	'haizeiwang' as "father.fav_movie"
+  	from sys_user;
   </select>
 </mapper>
