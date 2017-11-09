@@ -100,6 +100,23 @@ public class ScriptSqlProvider {
         sql.add("</if>");
         return wrapScript(String.join(lineSeparator, sql));
     }
+    public String selectUniqueByExample(XMLMapperConf helper) {
+        List<String> sql = new ArrayList<>();
+        sql.add("select");
+        sql.add("<if test='distinct' >");
+        sql.add("distinct");
+        sql.add("</if>");
+        sql.add("'false' as QUERYID,");
+        sql.add(String.join(",", helper.getMappedColumns()));
+        sql.add("from " + helper.getTablename());
+        sql.add("<if test='_parameter != null' >");
+        sql.add(whereClause(helper));
+        sql.add("</if>");
+        sql.add("<if test='orderByClause != null'>");
+        sql.add("order by ${orderByClause}");
+        sql.add("</if>");
+        return wrapScript(String.join(lineSeparator, sql));
+    }
 
     public String updateByExampleSelective(XMLMapperConf helper) {
         List<String> sql = new ArrayList<>();
