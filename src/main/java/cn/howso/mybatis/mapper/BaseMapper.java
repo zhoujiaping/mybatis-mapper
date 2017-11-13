@@ -36,6 +36,10 @@ public interface BaseMapper<ENTITY, EXAMPLE, PK>{
     @ResultMap("BaseResultMap")
     @Select("howso-selectByExample")
     List<ENTITY> selectByExample(EXAMPLE example);
+    
+    @ResultMap("BaseResultMap")
+    @Select("howso-selectUniqueByExample")
+    ENTITY selectUniqueByExample(EXAMPLE example);
 
     @ResultType(Integer.class)
     @Update("howso-updateByExampleSelective")
@@ -79,6 +83,7 @@ public interface BaseMapper<ENTITY, EXAMPLE, PK>{
     int insertSelectiveSelectKey(ENTITY record);*/
     /**
      * 比在xml中配置<selectKey></selectKey>更易理解
+     * @param <T>
      * */
     @ResultType(Object.class)
     @Select("howso-selectKey")
