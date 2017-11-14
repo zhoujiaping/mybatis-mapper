@@ -1,7 +1,11 @@
 package cn.howso.mybatis.builder;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.sql.SQLException;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.Properties;
 
 import javax.sql.DataSource;
@@ -223,12 +227,12 @@ public class MySqlSessionFactoryBean
 			}
 		}
 
-		int arg26;
+		int resourcesLength;
 		if (!ObjectUtils.isEmpty(this.typeAliases)) {
 			Class[] arg24 = this.typeAliases;
-			arg26 = arg24.length;
+			resourcesLength = arg24.length;
 
-			for (arg4 = 0; arg4 < arg26; ++arg4) {
+			for (arg4 = 0; arg4 < resourcesLength; ++arg4) {
 				Class arg29 = arg24[arg4];
 				configuration.getTypeAliasRegistry().registerAlias(arg29);
 				if (LOGGER.isDebugEnabled()) {
@@ -239,9 +243,9 @@ public class MySqlSessionFactoryBean
 
 		if (!ObjectUtils.isEmpty(this.plugins)) {
 			Interceptor[] arg25 = this.plugins;
-			arg26 = arg25.length;
+			resourcesLength = arg25.length;
 
-			for (arg4 = 0; arg4 < arg26; ++arg4) {
+			for (arg4 = 0; arg4 < resourcesLength; ++arg4) {
 				Interceptor arg30 = arg25[arg4];
 				configuration.addInterceptor(arg30);
 				if (LOGGER.isDebugEnabled()) {
@@ -266,9 +270,9 @@ public class MySqlSessionFactoryBean
 
 		if (!ObjectUtils.isEmpty(this.typeHandlers)) {
 			TypeHandler[] arg27 = this.typeHandlers;
-			arg26 = arg27.length;
+			resourcesLength = arg27.length;
 
-			for (arg4 = 0; arg4 < arg26; ++arg4) {
+			for (arg4 = 0; arg4 < resourcesLength; ++arg4) {
 				TypeHandler arg32 = arg27[arg4];
 				configuration.getTypeHandlerRegistry().register(arg32);
 				if (LOGGER.isDebugEnabled()) {
@@ -308,11 +312,11 @@ public class MySqlSessionFactoryBean
 
 		configuration.setEnvironment(new Environment(this.environment, this.transactionFactory, this.dataSource));
 		if (!ObjectUtils.isEmpty(this.mapperLocations)) {
-			Resource[] arg28 = this.mapperLocations;
-			arg26 = arg28.length;
+			Resource[] resources = this.mapperLocations;
+			resourcesLength = resources.length;
 
-			for (arg4 = 0; arg4 < arg26; ++arg4) {
-				Resource arg33 = arg28[arg4];
+			for (arg4 = 0; arg4 < resourcesLength; ++arg4) {
+				Resource arg33 = resources[arg4];
 				if (arg33 != null) {
 					try {
 						MyXMLMapperBuilder arg31 = new MyXMLMapperBuilder(arg33.getInputStream(), configuration,
@@ -329,6 +333,33 @@ public class MySqlSessionFactoryBean
 					}
 				}
 			}
+			//解析完扫描到的mapper.xml之后，自动添加没有的mapper.xml
+			Collection<Class<?>> parsedMappers = xmlConfigBuilder.getConfiguration().getMapperRegistry().getMappers();
+			MapperHolder.MAPPERS.removeAll(parsedMappers);
+			Iterator<Class<?>> mapperClassIterator = MapperHolder.MAPPERS.iterator();
+			String mapperClassName = null;
+			String xml = new StringBuilder()
+					.append("<?xml version=\"1.0\" encoding=\"UTF-8\" ?>")
+					.append("<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\" >")
+			 		.append("<mapper namespace=\"%s\">")
+			 		.append("</mapper>").toString();
+			while(mapperClassIterator.hasNext()){
+				mapperClassName = mapperClassIterator.next().getName();
+				try {
+					InputStream in = new ByteArrayInputStream(String.format(xml,mapperClassName).getBytes());;
+					MyXMLMapperBuilder mapperBuilder = new MyXMLMapperBuilder(in, configuration,
+							mapperClassName, configuration.getSqlFragments());
+					mapperBuilder.parse();
+				} catch (Exception arg19) {
+					throw new NestedIOException("Failed to parse mapping resource: \'" + mapperClassName + "\'", arg19);
+				} finally {
+					ErrorContext.instance().reset();
+				}
+				if (LOGGER.isDebugEnabled()) {
+					LOGGER.debug("Parsed mapper file: \'" + mapperClassName + "\'");
+				}
+			}
+			//完毕
 		} else if (LOGGER.isDebugEnabled()) {
 			LOGGER.debug("Property \'mapperLocations\' was not specified or no matching resources found");
 		}

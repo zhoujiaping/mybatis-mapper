@@ -2,7 +2,6 @@ package cn.howso.mybatis.builder;
 import java.io.InputStream;
 import java.io.Reader;
 import java.util.Properties;
-import java.util.Set;
 
 import javax.sql.DataSource;
 

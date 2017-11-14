@@ -38,6 +38,8 @@ import org.springframework.core.type.filter.AssignableTypeFilter;
 import org.springframework.core.type.filter.TypeFilter;
 import org.springframework.util.StringUtils;
 
+import cn.howso.mybatis.util.ReflectHelper;
+
 /**
 * BeanDefinitionRegistryPostProcessor that searches recursively starting from a base package for
 * interfaces and registers them as {@code MapperFactoryBean}. Note that only interfaces with at
@@ -385,7 +387,12 @@ public class MyMapperScannerConfigurer implements BeanDefinitionRegistryPostProc
      } else {
        for (BeanDefinitionHolder holder : beanDefinitions) {
          GenericBeanDefinition definition = (GenericBeanDefinition) holder.getBeanDefinition();
-
+         //收集扫描到的Mapper类
+         try {
+			MapperHolder.MAPPERS.add(Class.forName((String)ReflectHelper.getValueByFieldName(definition, "beanClass")));
+		} catch (SecurityException | NoSuchFieldException | IllegalArgumentException | IllegalAccessException | ClassNotFoundException e) {
+			throw new RuntimeException("收集扫描到的Mapper异常");
+		}
          if (logger.isDebugEnabled()) {
            logger.debug("Creating MapperFactoryBean with name '" + holder.getBeanName()
                + "' and '" + definition.getBeanClassName() + "' mapperInterface");
