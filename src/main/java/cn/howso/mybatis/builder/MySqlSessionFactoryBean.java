@@ -6,8 +6,6 @@ import java.util.Properties;
 
 import javax.sql.DataSource;
 
-import org.apache.ibatis.builder.xml.XMLConfigBuilder;
-import org.apache.ibatis.builder.xml.XMLMapperBuilder;
 import org.apache.ibatis.cache.Cache;
 import org.apache.ibatis.executor.ErrorContext;
 import org.apache.ibatis.io.VFS;
@@ -38,7 +36,7 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 public class MySqlSessionFactoryBean
-		implements FactoryBean<SqlSessionFactory>, InitializingBean, ApplicationListener<ApplicationEvent> {
+		implements FactoryBean<SqlSessionFactory>, InitializingBean, ApplicationListener<ApplicationEvent>{
 	private static final Log LOGGER = LogFactory.getLog(SqlSessionFactoryBean.class);
 	private Resource configLocation;
 	private Configuration configuration;
@@ -317,7 +315,7 @@ public class MySqlSessionFactoryBean
 				Resource arg33 = arg28[arg4];
 				if (arg33 != null) {
 					try {
-						XMLMapperBuilder arg31 = new XMLMapperBuilder(arg33.getInputStream(), configuration,
+						MyXMLMapperBuilder arg31 = new MyXMLMapperBuilder(arg33.getInputStream(), configuration,
 								arg33.toString(), configuration.getSqlFragments());
 						arg31.parse();
 					} catch (Exception arg19) {
@@ -360,4 +358,5 @@ public class MySqlSessionFactoryBean
 		}
 
 	}
+
 }
