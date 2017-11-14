@@ -253,7 +253,12 @@ public class ScriptSqlProvider {
     }*/
     public String selectKey(XMLMapperConf helper){
         List<String> sql = new ArrayList<>();
-        sql.add(String.format("select nextVal('%s_id_seq')", helper.getTablename()));
+        String pkType = helper.getIdResultMapping().getJavaType().getSimpleName();
+        if(pkType.equals("Integer")){
+            sql.add(String.format("select nextVal('%s_id_seq')::int4", helper.getTablename()));
+        }else if(pkType.equals("Long")){
+            sql.add(String.format("select nextVal('%s_id_seq')", helper.getTablename()));
+        }
         return wrapScript(String.join(lineSeparator, sql));
     }
     private String exampleWhereClause(XMLMapperConf helper) {

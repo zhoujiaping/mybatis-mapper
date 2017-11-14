@@ -1,4 +1,4 @@
-package cn.howso.mybatis.session;
+package cn.howso.mybatis.builder;
 import java.io.InputStream;
 import java.io.Reader;
 import java.util.Properties;
