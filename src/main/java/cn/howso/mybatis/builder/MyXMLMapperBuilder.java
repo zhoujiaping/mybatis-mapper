@@ -13,7 +13,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package cn.howso.mybatis.session;
+package cn.howso.mybatis.builder;
 
 import java.io.InputStream;
 import java.io.Reader;
@@ -51,6 +51,8 @@ import org.apache.ibatis.parsing.XPathParser;
 import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.TypeHandler;
+
+import cn.howso.mybatis.anno.AutoBaseResultMap;
 
 /**
  * @author Clinton Begin
@@ -134,7 +136,8 @@ public class MyXMLMapperBuilder extends BaseBuilder {
 	  if(genericInterfaces!=null&&genericInterfaces.length>0){
 		  for(int i=0;i<genericInterfaces.length;i++){
 			  String typeName = genericInterfaces[i].getTypeName();
-			  if(typeName.contains("BaseMapper")){
+			  AutoBaseResultMap anno = mapper.getAnnotation(AutoBaseResultMap.class);
+			  if(anno!=null && typeName.contains("BaseMapper")){
 				  ParameterizedType pt = (ParameterizedType) genericInterfaces[i];
 				  Type[] actualTypeArgs = pt.getActualTypeArguments();
 				  Class<?> modelClass = (Class<?>) actualTypeArgs[0];
@@ -171,7 +174,8 @@ private XNode mapModelToBaseResultMapNode(Class<?> modelClass) {
 	return node;
 }
 private String javaTypeTojdbcType(Class<?> fieldType) {
-	Map<String,String> map = new HashMap<>();
+    
+    Map<String,String> map = new HashMap<>();
 	map.put("java.lang.String", "VARCHAR");
 	map.put("java.lang.Integer", "INTEGER");
 	map.put("java.lang.Long", "BIGINT");

@@ -1,4 +1,4 @@
-package cn.howso.mybatis.session;
+package cn.howso.mybatis.builder;
 
 import java.io.IOException;
 import java.sql.SQLException;
