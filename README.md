@@ -1,38 +1,44 @@
 # mybatis-mapper
-项目背景：
-    本人一开始是用hibernate做开发的。换了公司之后，公司内部用mybatis，于是开始使用mybatis。在使用mybatis的过程中，
-    发现一些通用的操作，比如单表的CURD，在每一个xml文件中都需要定义一遍。而且每个人写的风格又不统一。于是寻找了一个解决
-    办法，使用maven插件mybatis-generator。使用一段时间之后，发现还是不能令人满意。每次修改表结构，都要重新生成代码。
-    还要把自定义的代码和自动生成的代码手工合并到一起。并且自动生成的代码体积庞大，结构相同。开始怀念hibernate，but，问题
-    还是需要解决的。于是阅读mybatis的源码，设计一个能够自动生成通用sql、又能够将通用sql和手写的sql分离的解决方案。经历过好
-    几个版本的迭代，当前版本已经在生产环境可用了。
-该项目主要提供：
-1、mybatis分页查询插件以及分页参数和结果的封装；
-public PageRes<User> queryUserByPage(User condition,Pageable page) {
-      //...
-      List<User> rows = UserMapper.queryUserByPage(condition ,page);
-      return PageRes.of(rows,page);
-}
-Pageable有两个子类LimitPage和IndexPage，分别用于limit-offset方式的分页和index-size方式的分页。
-2、mybatis单表CURD通用dao；
-    int countByExample(EXAMPLE example);//example是查询条件的封装，支持mybatis-generator的Example以及该项目中自定义的Example。
-    int deleteByExample(EXAMPLE example);
-    int insert(ENTITY record);
-    int insertSelective(ENTITY record);
-    List<ENTITY> selectByExample(EXAMPLE example);
-    ENTITY selectUniqueByExample(EXAMPLE example);
-    int updateByExampleSelective(@Param("record") ENTITY record, @Param("example") EXAMPLE example);
-    int updateByExample(@Param("record") ENTITY record, @Param("example") EXAMPLE example);
-    List<ENTITY> selectByExampleByPage(@Param("example") EXAMPLE example, @Param("page") Pageable page);
-    int batchInsert(@Param("recordList") List<ENTITY> recordList);
-    int batchInsertSelective(@Param("recordList") List<ENTITY> recordList);
-    int deleteByPrimaryKey(@Param("id") PK id);// @Param("id")不要删除，约定名称为传参名为id，这样简单方便。
-    ENTITY selectByPrimaryKey(@Param("id") PK id);// @Param("id")不要删除，约定名称为传参名为id，这样简单方便。
-    int updateByPrimaryKeySelective(ENTITY record);
-    int updateByPrimaryKey(ENTITY record);
-    PK selectKey();
-3、通用dao支持两种查询条件的封装方式；
-    3.1、支持mybatis-generator的Example以及该项目中自定义的Example。
+## 项目背景：
+本人一开始是用hibernate做开发的。换了公司之后，公司内部用mybatis，于是开始使用mybatis。在使用mybatis的过程中，
+发现一些通用的操作，比如单表的CURD，在每一个xml文件中都需要定义一遍。而且每个人写的风格又不统一。于是寻找了一个解决
+办法，使用maven插件mybatis-generator。使用一段时间之后，发现还是不能令人满意。每次修改表结构，都要重新生成代码。
+还要把自定义的代码和自动生成的代码手工合并到一起。并且自动生成的代码体积庞大，结构相同。开始怀念hibernate，but，问题
+还是需要解决的。于是阅读mybatis的源码，设计一个能够自动生成通用sql、又能够将通用sql和手写的sql分离的解决方案。经历过好
+几个版本的迭代，当前版本已经在生产环境可用了。
+## 该项目主要提供：
+
+1. mybatis分页查询插件以及分页参数和结果的封装
+    ```
+	public PageRes<User> queryUserByPage(User condition,Pageable page) {
+        //...
+        List<User> rows = UserMapper.queryUserByPage(condition ,page);
+        return PageRes.of(rows,page);
+    }
+	```
+    Pageable有两个子类LimitPage和IndexPage，分别用于limit-offset方式的分页和index-size方式的分页。
+
+2. mybatis单表CURD通用dao
+    * int countByExample(EXAMPLE example);//example是查询条件的封装，支持mybatis-generator的Example以及该项目中自定义的Example。
+    * int deleteByExample(EXAMPLE example);
+    * int insert(ENTITY record);
+    * int insertSelective(ENTITY record);
+    * List<ENTITY> selectByExample(EXAMPLE example);
+    * ENTITY selectUniqueByExample(EXAMPLE example);
+    * int updateByExampleSelective(@Param("record") ENTITY record, @Param("example") EXAMPLE example);
+    * int updateByExample(@Param("record") ENTITY record, @Param("example") EXAMPLE example);
+    * List<ENTITY> selectByExampleByPage(@Param("example") EXAMPLE example, @Param("page") Pageable page);
+    * int batchInsert(@Param("recordList") List<ENTITY> recordList);
+    * int batchInsertSelective(@Param("recordList") List<ENTITY> recordList);
+    * int deleteByPrimaryKey(@Param("id") PK id);// @Param("id")不要删除，约定名称为传参名为id，这样简单方便。
+    * ENTITY selectByPrimaryKey(@Param("id") PK id);// @Param("id")不要删除，约定名称为传参名为id，这样简单方便。
+    * int updateByPrimaryKeySelective(ENTITY record);
+    * int updateByPrimaryKey(ENTITY record);
+    * PK selectKey();
+	
+3. 通用dao支持两种查询条件的封装方式；
+
+    3.1 支持mybatis-generator的Example以及该项目中自定义的Example。
     mybatis-generator的XXXExample，每个实体类都需要一个XXXExample，每次修改表结构都需要重新生成XXXExample，
     缺点是重构麻烦，优点是享受编译器静态语法检查，适合需要稳步前进的大项目。
     3.2、项目中定义的通用Example，代码简单。比如构建一个查询条件
