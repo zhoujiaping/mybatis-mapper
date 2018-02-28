@@ -38,17 +38,21 @@
 	
 3. 通用dao支持两种查询条件的封装方式；
 
-    3.1 支持mybatis-generator的Example以及该项目中自定义的Example。
+    1. 支持mybatis-generator的Example以及该项目中自定义的Example。
     mybatis-generator的XXXExample，每个实体类都需要一个XXXExample，每次修改表结构都需要重新生成XXXExample，
     缺点是重构麻烦，优点是享受编译器静态语法检查，适合需要稳步前进的大项目。
-    3.2、项目中定义的通用Example，代码简单。比如构建一个查询条件
+	
+    2. 项目中定义的通用Example，代码简单。比如构建一个查询条件
+	```
     Example example = new Example();
     example.createCriteria().and("scene_id").equalTo(sceneId)
     .and("datetime").equalTo(datetime);
     return sceneEciCountMapper.selectByExample(example );
+	```
     缺点是基于字符串，不能享受静态检查，优点是重构时不需要重新生成代码，适合快速开发小项目。
-    3.3、两种Example方式可以很容易的相互转换。因为通用Example就是基于mybatis-generator插件生成的XXXExample设计的。
-项目局限
-    仅仅解决了单表的CURD问题，没有对表关联的问题提出解决方案。并且对于单表的CURD，也不是完全支持，比如不支持SUM等聚合操作；
-    项目中有些强制约定，比如主键名字必须是id；
-    项目中个别地方没有支持postgresql之外的数据库，比如PK selectKey()获取一个id，当然实现起来是比较容易的；
+    3. 两种Example方式可以很容易的相互转换。因为通用Example就是基于mybatis-generator插件生成的XXXExample设计的。
+
+## 项目局限
+仅仅解决了单表的CURD问题，没有对表关联的问题提出解决方案。并且对于单表的CURD，也不是完全支持，比如不支持SUM等聚合操作；
+项目中有些强制约定，比如主键名字必须是id；
+项目中个别地方没有支持postgresql之外的数据库，比如PK selectKey()获取一个id，当然实现起来是比较容易的；
