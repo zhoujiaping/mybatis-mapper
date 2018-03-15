@@ -59,4 +59,5 @@
 项目中个别地方没有支持postgresql之外的数据库，比如PK selectKey()获取一个id，当然实现起来是比较容易的；
 
 ## 使用方式
+参考<https://github.com/zhoujiaping/mybatis-mapper/blob/master/doc/README.txt>
 参考<https://github.com/zhoujiaping/my-seed>
