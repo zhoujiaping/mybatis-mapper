@@ -172,7 +172,7 @@ public class MybatisTest {
         example.createCriteria().and("name").notLike("%avril%");
         IndexPage page = IndexPage.of(1, 3);
         List<User> rows = userMapper.selectByExampleByPage(example,page);
-        PageRes<User> pageRes = PageRes.of(page, rows);
+        PageRes<User> pageRes = PageRes.of(rows,page);
         Assert.assertEquals(pageRes.getTotal().intValue(), 4);
         Assert.assertEquals(pageRes.getRows().size(), 3);
         session.rollback();

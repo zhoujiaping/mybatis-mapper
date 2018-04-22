@@ -5,7 +5,7 @@ import java.util.List;
 public class PageRes<T> {
     private Integer total;
     private List<T> rows;
-    public static <T> PageRes<T> of(Pageable page,List<T> rows){
+    public static <T> PageRes<T> of(List<T> rows,Pageable page){
         PageRes<T> pageRes = new PageRes<>();
         pageRes.total = page.getTotal();
         pageRes.setRows(rows);
@@ -26,7 +26,7 @@ public class PageRes<T> {
     public void setRows(List<T> rows) {
         this.rows = rows;
     }
-    public static <T> PageRes<T> of(int size, List<T> rows) {
+    public static <T> PageRes<T> of(List<T> rows,int size) {
         PageRes<T> pageRes = new PageRes<>();
         pageRes.total = size;
         pageRes.setRows(rows);
