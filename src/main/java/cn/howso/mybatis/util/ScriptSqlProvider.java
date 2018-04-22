@@ -117,12 +117,21 @@ public class ScriptSqlProvider {
         sql.add("</if>");
         return wrapScript(String.join(lineSeparator, sql));
     }
+    private boolean isOptiMapping(ResultMapping rm){
+    	return rm.getColumn().equals(XMLMapperConf.OPTI_COLUMN_NAME);
+    }
+    private String getOptiColumnSetter(){
+    	return String.format("%s=%s+1,",XMLMapperConf.OPTI_COLUMN_NAME,XMLMapperConf.OPTI_COLUMN_NAME);
+    }
 
     public String updateByExampleSelective(XMLMapperConf helper) {
         List<String> sql = new ArrayList<>();
         sql.add("update " + helper.getTablename());
         sql.add("<set>");
         sql.add(helper.getResultMappings().stream().map(mapping -> {
+        	if(helper.isEnableOptimisticLock() && isOptiMapping(mapping)){
+        		return getOptiColumnSetter();
+        	}
             return String.format("<if test='record.%s != null'>%s=#{record.%s,jdbcType=%s},</if>",
                     mapping.getProperty(), mapping.getColumn(), mapping.getProperty(), mapping.getJdbcType());
         }).collect(Collectors.joining(lineSeparator)));
@@ -138,6 +147,9 @@ public class ScriptSqlProvider {
         sql.add("update " + helper.getTablename());
         sql.add(" set ");
         sql.add(helper.getResultMappings().stream().map(mapping -> {
+        	if(helper.isEnableOptimisticLock() && isOptiMapping(mapping)){
+        		return getOptiColumnSetter();
+        	}
             return String.format("%s = #{record.%s,jdbcType=%s}", mapping.getColumn(), mapping.getProperty(),
                     mapping.getJdbcType());
         }).collect(Collectors.joining("," + lineSeparator)));
@@ -154,6 +166,9 @@ public class ScriptSqlProvider {
         sql.add("update " + helper.getTablename());
         sql.add("<set>");
         sql.add(helper.getResultMappings().stream().filter(mapping->!mapping.getColumn().equals(idRM.getColumn())).map(mapping -> {
+        	if(helper.isEnableOptimisticLock() && isOptiMapping(mapping)){
+        		return getOptiColumnSetter();
+        	}
             return String.format("<if test='%s != null'>%s = #{%s,jdbcType=%s},</if>",
                     mapping.getProperty(), mapping.getColumn(), mapping.getProperty(), mapping.getJdbcType());
         }).collect(Collectors.joining(lineSeparator)));
@@ -169,6 +184,9 @@ public class ScriptSqlProvider {
         sql.add("update " + helper.getTablename());
         sql.add(" set ");
         sql.add(helper.getResultMappings().stream().map(mapping -> {
+        	if(helper.isEnableOptimisticLock() && isOptiMapping(mapping)){
+        		return getOptiColumnSetter();
+        	}
             return String.format("%s = #{%s,jdbcType=%s}", mapping.getColumn(), mapping.getProperty(),
                     mapping.getJdbcType());
         }).collect(Collectors.joining(",")));
