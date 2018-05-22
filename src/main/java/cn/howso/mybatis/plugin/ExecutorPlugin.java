@@ -2,8 +2,10 @@ package cn.howso.mybatis.plugin;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 
 import org.apache.ibatis.executor.Executor;
 import org.apache.ibatis.mapping.MappedStatement;
@@ -27,6 +29,8 @@ import cn.howso.mybatis.util.XMLMapperConf;
                 RowBounds.class, ResultHandler.class }),
         @Signature(type = Executor.class, method = "update", args = {MappedStatement.class, Object.class }) })
 public class ExecutorPlugin implements Interceptor {
+	private String dialect;
+	
     //private static final Logger logger = Logger.getLogger(ExecutorPlugin.class);
     private static final Map<String, Method> providerMethodMap = new HashMap<>();
     static {
@@ -52,7 +56,7 @@ public class ExecutorPlugin implements Interceptor {
                     String mapperClazzName = statementId.substring(0, index);
                     ScriptSqlProvider provider = new ScriptSqlProvider();
                     Method method = providerMethodMap.get(methodName);
-                    String script = (String) method.invoke(provider, XMLMapperConf.of(configuration, mapperClazzName));
+                    String script = (String) method.invoke(provider, XMLMapperConf.of(configuration, mapperClazzName,dialect));
                     // 不支持写<selectKey>，不支持<include>
                     // "<script>select * from sys_user <where> 1=1</where>order by #{orderByClause}</script>";
                     Class<?> paramClazz = parameterObject==null?null:parameterObject.getClass();
@@ -73,5 +77,15 @@ public class ExecutorPlugin implements Interceptor {
     }
 
     public void setProperties(Properties properties) {
+    	dialect = properties.getProperty("dialect");
+    	if(dialect==null){
+    		dialect = "postgresql";
+    	}
+    	Set<String> dialects = new HashSet<>();
+    	dialects.add("postgresql");
+    	dialects.add("mysql");
+    	if(!dialects.contains(dialect)){
+    		throw new RuntimeException("dialect="+dialect+" 不被支持,目前仅支持"+String.join(",", dialects));
+    	}
     }
 }

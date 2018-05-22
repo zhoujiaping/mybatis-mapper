@@ -17,9 +17,10 @@ PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
 	</typeAliases>
 	<plugins>
 		<plugin interceptor="cn.howso.mybatis.plugin.ExecutorPlugin">
+			<property name="dialect" value="postgre" />
 		</plugin>
 		<plugin interceptor="cn.howso.mybatis.plugin.PagePlugin">
-			<property name="dialect" value="postgre" />
+			<property name="dialect" value="postgresql" />
 			<property name="pageSqlId" value=".*ByPage.*" />
 		</plugin>
 	</plugins>

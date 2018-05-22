@@ -23,7 +23,7 @@ public abstract class Pageable {
             pageSql.append(offset + limit);
             pageSql.append(") where row_id>");
             pageSql.append(offset);
-        } else if ("postgre".equals(dialect)) {
+        } else if ("postgresql".equals(dialect)) {
             pageSql.append(sql);
             pageSql.append(" limit " + limit + " offset  " + offset);
         }

@@ -20,6 +20,7 @@ public class XMLMapperConf {
     private ResultMapping idResultMapping;
     private ResultMap resultMap;
     private boolean enableOptimisticLock;//是否启用乐观锁
+    private String dialect;
     
     
     public static final String OPTI_COLUMN_NAME = "opti_version";
@@ -29,7 +30,7 @@ public class XMLMapperConf {
     	OPTI_JAVA_TYPE_NAME_SET.add(Long.class.getName());
     }
     
-	public static XMLMapperConf of(Configuration configuration,String mapperClazzName) throws ClassNotFoundException{
+	public static XMLMapperConf of(Configuration configuration,String mapperClazzName, String dialect) throws ClassNotFoundException{
 		XMLMapperConf conf = new XMLMapperConf();
 		Class<?> clazz = Class.forName(mapperClazzName);
     	Table table = clazz.getAnnotation(Table.class);
@@ -83,6 +84,9 @@ public class XMLMapperConf {
 
 	public ResultMap getResultMap() {
 		return resultMap;
+	}
+	public String getDialect() {
+		return dialect;
 	}
 	
 }
