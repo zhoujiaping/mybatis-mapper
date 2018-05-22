@@ -64,6 +64,9 @@ public interface BaseMapper<ENTITY, EXAMPLE, PK>{
     @ResultType(Integer.class)
     @Delete("howso-deleteByPrimaryKey")
     int deleteByPrimaryKey(@Param("id") PK id);// @Param("id")不要删除，约定名称为传参名为id，这样简单方便。
+    @ResultType(Integer.class)
+    @Delete("howso-deleteByPrimaryKeyAndOptiVersion")
+    int deleteByPrimaryKeyAndOptiVersion(@Param("id") PK id,@Param("optiVersion")long optiVersion);// @Param("id")不要删除，约定名称为传参名为id，这样简单方便。
 
     @ResultMap("BaseResultMap")
     @Select("howso-selectByPrimaryKey")
@@ -72,11 +75,16 @@ public interface BaseMapper<ENTITY, EXAMPLE, PK>{
     @ResultType(Integer.class)
     @Update("howso-updateByPrimaryKeySelective")
     int updateByPrimaryKeySelective(ENTITY record);
+    @ResultType(Integer.class)
+    @Update("howso-updateByPrimaryKeyAndOptiVersionSelective")
+    int updateByPrimaryKeyAndOptiVersionSelective(ENTITY record);
 
     @ResultType(Integer.class)
     @Update("howso-updateByPrimaryKey")
     int updateByPrimaryKey(ENTITY record);
-
+    @ResultType(Integer.class)
+    @Update("howso-updateByPrimaryKeyAndOptiVersion")
+    int updateByPrimaryKeyAndOptiVersion(ENTITY record);
     /*@ResultType(Integer.class)
     @SelectKey(before=true,keyColumn="id",resultType=Integer.class,statement="select nextVal('sys_user_id_seq')", keyProperty = "id")
     @Insert("howso-insertSelectiveSelectKey")

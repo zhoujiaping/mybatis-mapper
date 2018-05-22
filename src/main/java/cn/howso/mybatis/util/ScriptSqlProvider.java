@@ -53,6 +53,14 @@ public class ScriptSqlProvider {
         sql.add(String.format("where %s= #{id,jdbcType=%s}", idMP.getColumn(), idMP.getJdbcType()));
         return wrapScript(String.join(lineSeparator, sql));
     }
+    public String deleteByPrimaryKeyAndOptiVersion(XMLMapperConf helper) {
+    	List<String> sql = new ArrayList<>();
+    	ResultMapping idMP = helper.getIdResultMapping();
+    	sql.add("delete from " + helper.getTablename());
+    	sql.add(String.format("where %s= #{id,jdbcType=%s}", idMP.getColumn(), idMP.getJdbcType()));
+    	sql.add(String.format("and %s=#{%s}", XMLMapperConf.OPTI_COLUMN_NAME,XMLMapperConf.OPTI_PROP_NAME));
+    	return wrapScript(String.join(lineSeparator, sql));
+    }
 
     public String insert(XMLMapperConf helper) {
         //getMappedColumns和getResultMappings的字段顺序不是一致的。
@@ -117,21 +125,17 @@ public class ScriptSqlProvider {
         sql.add("</if>");
         return wrapScript(String.join(lineSeparator, sql));
     }
-    private boolean isOptiMapping(ResultMapping rm){
+  /*  private boolean isOptiMapping(ResultMapping rm){
     	return rm.getColumn().equals(XMLMapperConf.OPTI_COLUMN_NAME);
-    }
-    private String getOptiColumnSetter(){
-    	return String.format("%s=%s+1,",XMLMapperConf.OPTI_COLUMN_NAME,XMLMapperConf.OPTI_COLUMN_NAME);
-    }
-
+    }*/
     public String updateByExampleSelective(XMLMapperConf helper) {
         List<String> sql = new ArrayList<>();
         sql.add("update " + helper.getTablename());
         sql.add("<set>");
         sql.add(helper.getResultMappings().stream().map(mapping -> {
-        	if(helper.isEnableOptimisticLock() && isOptiMapping(mapping)){
+        	/*if(helper.isEnableOptimisticLock() && isOptiMapping(mapping)){
         		return getOptiColumnSetter();
-        	}
+        	}*/
             return String.format("<if test='record.%s != null'>%s=#{record.%s,jdbcType=%s},</if>",
                     mapping.getProperty(), mapping.getColumn(), mapping.getProperty(), mapping.getJdbcType());
         }).collect(Collectors.joining(lineSeparator)));
@@ -147,9 +151,9 @@ public class ScriptSqlProvider {
         sql.add("update " + helper.getTablename());
         sql.add(" set ");
         sql.add(helper.getResultMappings().stream().map(mapping -> {
-        	if(helper.isEnableOptimisticLock() && isOptiMapping(mapping)){
+        	/*if(helper.isEnableOptimisticLock() && isOptiMapping(mapping)){
         		return getOptiColumnSetter();
-        	}
+        	}*/
             return String.format("%s = #{record.%s,jdbcType=%s}", mapping.getColumn(), mapping.getProperty(),
                     mapping.getJdbcType());
         }).collect(Collectors.joining("," + lineSeparator)));
@@ -166,9 +170,9 @@ public class ScriptSqlProvider {
         sql.add("update " + helper.getTablename());
         sql.add("<set>");
         sql.add(helper.getResultMappings().stream().filter(mapping->!mapping.getColumn().equals(idRM.getColumn())).map(mapping -> {
-        	if(helper.isEnableOptimisticLock() && isOptiMapping(mapping)){
+        	/*if(helper.isEnableOptimisticLock() && isOptiMapping(mapping)){
         		return getOptiColumnSetter();
-        	}
+        	}*/
             return String.format("<if test='%s != null'>%s = #{%s,jdbcType=%s},</if>",
                     mapping.getProperty(), mapping.getColumn(), mapping.getProperty(), mapping.getJdbcType());
         }).collect(Collectors.joining(lineSeparator)));
@@ -177,6 +181,25 @@ public class ScriptSqlProvider {
                 idRM.getJdbcType()));
         return wrapScript(String.join(lineSeparator, sql));
     }
+    public String updateByPrimaryKeyAndOptiVersionSelective(XMLMapperConf helper) {
+    	List<String> sql = new ArrayList<>();
+    	
+    	ResultMapping idRM = helper.getIdResultMapping();
+    	sql.add("update " + helper.getTablename());
+    	sql.add("<set>");
+    	sql.add(helper.getResultMappings().stream().filter(mapping->!mapping.getColumn().equals(idRM.getColumn())).map(mapping -> {
+    		/*if(helper.isEnableOptimisticLock() && isOptiMapping(mapping)){
+    			return getOptiColumnSetter();
+    		}*/
+    		return String.format("<if test='%s != null'>%s = #{%s,jdbcType=%s},</if>",
+    				mapping.getProperty(), mapping.getColumn(), mapping.getProperty(), mapping.getJdbcType());
+    	}).collect(Collectors.joining(lineSeparator)));
+    	sql.add("</set>");
+    	sql.add(String.format("where %s=#{%s,jdbcType=%s}", idRM.getColumn(), idRM.getProperty(),
+    			idRM.getJdbcType()));
+    	sql.add(String.format("and %s=#{%s}", XMLMapperConf.OPTI_COLUMN_NAME,XMLMapperConf.OPTI_PROP_NAME));
+    	return wrapScript(String.join(lineSeparator, sql));
+    }
 
     public String updateByPrimaryKey(XMLMapperConf helper) {
         List<String> sql = new ArrayList<>();
@@ -184,15 +207,32 @@ public class ScriptSqlProvider {
         sql.add("update " + helper.getTablename());
         sql.add(" set ");
         sql.add(helper.getResultMappings().stream().map(mapping -> {
-        	if(helper.isEnableOptimisticLock() && isOptiMapping(mapping)){
+        	/*if(helper.isEnableOptimisticLock() && isOptiMapping(mapping)){
         		return getOptiColumnSetter();
-        	}
+        	}*/
             return String.format("%s = #{%s,jdbcType=%s}", mapping.getColumn(), mapping.getProperty(),
                     mapping.getJdbcType());
         }).collect(Collectors.joining(",")));
         sql.add(String.format("where %s=#{%s,jdbcType=%s}", idRM.getColumn(), idRM.getProperty(),
                 idRM.getJdbcType()));
         return wrapScript(String.join(lineSeparator, sql));
+    }
+    public String updateByPrimaryKeyAndOptiVersion(XMLMapperConf helper) {
+    	List<String> sql = new ArrayList<>();
+    	ResultMapping idRM = helper.getIdResultMapping();
+    	sql.add("update " + helper.getTablename());
+    	sql.add(" set ");
+    	sql.add(helper.getResultMappings().stream().map(mapping -> {
+    		/*if(helper.isEnableOptimisticLock() && isOptiMapping(mapping)){
+        		return getOptiColumnSetter();
+        	}*/
+    		return String.format("%s = #{%s,jdbcType=%s}", mapping.getColumn(), mapping.getProperty(),
+    				mapping.getJdbcType());
+    	}).collect(Collectors.joining(",")));
+    	sql.add(String.format("where %s=#{%s,jdbcType=%s}", idRM.getColumn(), idRM.getProperty(),
+    			idRM.getJdbcType()));
+    	sql.add(String.format("and %s=#{%s}", XMLMapperConf.OPTI_COLUMN_NAME,XMLMapperConf.OPTI_PROP_NAME));
+    	return wrapScript(String.join(lineSeparator, sql));
     }
 
     /** 由插件去实现分页，该方法只是配合插件 */
