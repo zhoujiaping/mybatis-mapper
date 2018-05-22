@@ -63,7 +63,6 @@
 ## 项目局限
 仅仅解决了单表的CURD问题，没有对表关联的问题提出解决方案。并且对于单表的CURD，也不是完全支持，比如不支持SUM等聚合操作；
 项目中有些强制约定，比如主键名字必须是id；
-项目中个别地方没有支持postgresql之外的数据库，比如PK selectKey()获取一个id，当然实现起来是比较容易的；
 
 ## 使用方式
 * 参考<https://github.com/zhoujiaping/mybatis-mapper/blob/master/doc/README.txt>
