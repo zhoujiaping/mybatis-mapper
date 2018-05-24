@@ -53,6 +53,7 @@ import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.TypeHandler;
 
 import cn.howso.mybatis.anno.AutoBaseResultMap;
+import cn.howso.mybatis.util.Beans;
 
 /**
  * @author Clinton Begin
@@ -160,7 +161,7 @@ private XNode mapModelToBaseResultMapNode(Class<?> modelClass) {
 			if(jdbcType==null){
 				continue;
 			}
-			String columnName = camel2underline(fields[i].getName());
+			String columnName = Beans.camel2underline(fields[i].getName());
 			String propertyName = fields[i].getName();
 			if(fields[i].getName().equals("id")){
 				sb.append(String.format("<id column=\"%s\" jdbcType=\"%s\" property=\"%s\" />",columnName,jdbcType,propertyName));
@@ -192,10 +193,6 @@ private String javaTypeTojdbcType(Class<?> fieldType) {
 	map.put("java.sql.Time","TIME");
 	map.put("java.sql.Timestamp","TIMESTAMP");
 	return map.get(fieldType.getName());
-}
-
-private String camel2underline(String prop){
-	return prop.replaceAll("(?<Uper>[A-Z])", "_${Uper}").toLowerCase();
 }
 
 private void buildStatementFromContext(List<XNode> list) {

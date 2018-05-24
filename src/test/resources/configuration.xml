@@ -17,7 +17,10 @@ PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
 	</typeAliases>
 	<plugins>
 		<plugin interceptor="cn.howso.mybatis.plugin.ExecutorPlugin">
-			<property name="dialect" value="postgre" />
+			<!-- 方言 -->
+			<property name="dialect" value="postgresql" />
+			<!-- 乐观锁列名 -->
+			<property name="optiColumnName" value="version"/>
 		</plugin>
 		<plugin interceptor="cn.howso.mybatis.plugin.PagePlugin">
 			<property name="dialect" value="postgresql" />
@@ -30,7 +33,7 @@ PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
 			<dataSource type="POOLED">
 				<property name="driver" value="org.postgresql.Driver" />
 				<property name="url" value="jdbc:postgresql://localhost:5432/test" />
-				<property name="username" value="postgres" />
+				<property name="username" value="postgresql" />
 				<property name="password" value="123456" />
 			</dataSource>
 		</environment>

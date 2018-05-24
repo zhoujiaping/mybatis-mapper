@@ -10,8 +10,6 @@ import org.apache.ibatis.session.Configuration;
 import cn.howso.mybatis.anno.Table;
 
 public class XMLMapperConf {
-    public static final Object OPTI_COLUMN_NAME = "opti_version";
-    public static final Object OPTI_PROP_NAME = "optiVersion";
 	private String tablename;
     private Set<String> mappedColumns;
     private Set<String> mappedProperties;
@@ -20,23 +18,19 @@ public class XMLMapperConf {
     private ResultMap resultMap;
     private boolean enableOptimisticLock;//是否启用乐观锁
     private String dialect;
+    private String optiColumnName;
+    private String optiPropertyName;
     
-    
-    //public static final String OPTI_COLUMN_NAME = "opti_version";
-   /* private static final Set<String> OPTI_JAVA_TYPE_NAME_SET = new HashSet<>();
-    static{
-    	OPTI_JAVA_TYPE_NAME_SET.add(Integer.class.getName());
-    	OPTI_JAVA_TYPE_NAME_SET.add(Long.class.getName());
-    }*/
-    
-	public static XMLMapperConf of(Configuration configuration,String mapperClazzName, String dialect) throws ClassNotFoundException{
+	public static XMLMapperConf of(Configuration configuration,String mapperClazzName, String dialect, String optiColumnName) throws ClassNotFoundException{
 		XMLMapperConf conf = new XMLMapperConf();
 		Class<?> clazz = Class.forName(mapperClazzName);
     	Table table = clazz.getAnnotation(Table.class);
     	if(table == null){
     		throw new RuntimeException(String.format("BaseMapper需要和%s一起使用", Table.class.getName()));
     	}
-    	
+    	conf.optiColumnName = optiColumnName;
+    	conf.optiPropertyName = Beans.underline2camel(optiColumnName);
+    	conf.dialect = dialect;
     	conf.tablename = table.name();
     	conf.resultMap = configuration.getResultMap(mapperClazzName+".BaseResultMap");
         conf.idResultMapping = conf.resultMap.getIdResultMappings().get(0);
@@ -74,5 +68,10 @@ public class XMLMapperConf {
 	public String getDialect() {
 		return dialect;
 	}
-	
+	public String getOptiColumnName() {
+		return optiColumnName;
+	}
+	public String getOptiPropertyName() {
+		return optiPropertyName;
+	}
 }

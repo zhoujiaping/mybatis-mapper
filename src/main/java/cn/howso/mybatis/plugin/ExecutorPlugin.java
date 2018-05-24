@@ -30,6 +30,7 @@ import cn.howso.mybatis.util.XMLMapperConf;
         @Signature(type = Executor.class, method = "update", args = {MappedStatement.class, Object.class }) })
 public class ExecutorPlugin implements Interceptor {
 	private String dialect;
+	private String optiColumnName;
 	
     //private static final Logger logger = Logger.getLogger(ExecutorPlugin.class);
     private static final Map<String, Method> providerMethodMap = new HashMap<>();
@@ -56,7 +57,7 @@ public class ExecutorPlugin implements Interceptor {
                     String mapperClazzName = statementId.substring(0, index);
                     ScriptSqlProvider provider = new ScriptSqlProvider();
                     Method method = providerMethodMap.get(methodName);
-                    String script = (String) method.invoke(provider, XMLMapperConf.of(configuration, mapperClazzName,dialect));
+                    String script = (String) method.invoke(provider, XMLMapperConf.of(configuration, mapperClazzName,dialect,optiColumnName));
                     // 不支持写<selectKey>，不支持<include>
                     // "<script>select * from sys_user <where> 1=1</where>order by #{orderByClause}</script>";
                     Class<?> paramClazz = parameterObject==null?null:parameterObject.getClass();
@@ -86,6 +87,10 @@ public class ExecutorPlugin implements Interceptor {
     	dialects.add("mysql");
     	if(!dialects.contains(dialect)){
     		throw new RuntimeException("dialect="+dialect+" 不被支持,目前仅支持"+String.join(",", dialects));
+    	}
+    	optiColumnName = properties.getProperty("optiColumnName");
+    	if(optiColumnName==null){
+    		optiColumnName = "opti_version";
     	}
     }
 }

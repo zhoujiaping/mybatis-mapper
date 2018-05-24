@@ -17,13 +17,13 @@ public class ScriptSqlProvider {
 
     public String selectByPrimaryKey(XMLMapperConf helper) throws ClassNotFoundException {
         Set<String> columns = helper.getMappedColumns();
-        ResultMapping idResultMapping = helper.getIdResultMapping();
+        ResultMapping idMP = helper.getIdResultMapping();
         List<String> sql = new ArrayList<>();
         sql.add("select");
         sql.add(String.join(",", columns));
         sql.add("from " + helper.getTablename());
-        sql.add(String.format("where %s=#{id,jdbcType=%s}", idResultMapping.getColumn(),
-                idResultMapping.getJdbcType()));
+        sql.add(String.format("where %s=#{%s,jdbcType=%s}",idMP.getProperty(), idMP.getColumn(),
+        		idMP.getJdbcType()));
         return wrapScript(String.join(lineSeparator, sql));
         // return "<script>select * from sys_user <where>id=#{id}</where></script>";
     }
@@ -50,15 +50,17 @@ public class ScriptSqlProvider {
         List<String> sql = new ArrayList<>();
         ResultMapping idMP = helper.getIdResultMapping();
         sql.add("delete from " + helper.getTablename());
-        sql.add(String.format("where %s= #{id,jdbcType=%s}", idMP.getColumn(), idMP.getJdbcType()));
+        sql.add(String.format("where %s=#{%s,jdbcType=%s}",idMP.getProperty(), idMP.getColumn(),
+        		idMP.getJdbcType()));
         return wrapScript(String.join(lineSeparator, sql));
     }
     public String deleteByPrimaryKeyAndOptiVersion(XMLMapperConf helper) {
     	List<String> sql = new ArrayList<>();
     	ResultMapping idMP = helper.getIdResultMapping();
     	sql.add("delete from " + helper.getTablename());
-    	sql.add(String.format("where %s= #{id,jdbcType=%s}", idMP.getColumn(), idMP.getJdbcType()));
-    	sql.add(String.format("and %s=#{%s}", XMLMapperConf.OPTI_COLUMN_NAME,XMLMapperConf.OPTI_PROP_NAME));
+    	 sql.add(String.format("where %s=#{%s,jdbcType=%s}",idMP.getProperty(), idMP.getColumn(),
+         		idMP.getJdbcType()));
+    	sql.add(String.format("and %s=#{%s}", helper.getOptiColumnName(),helper.getOptiPropertyName()));
     	return wrapScript(String.join(lineSeparator, sql));
     }
 
@@ -197,7 +199,7 @@ public class ScriptSqlProvider {
     	sql.add("</set>");
     	sql.add(String.format("where %s=#{%s,jdbcType=%s}", idRM.getColumn(), idRM.getProperty(),
     			idRM.getJdbcType()));
-    	sql.add(String.format("and %s=#{%s}", XMLMapperConf.OPTI_COLUMN_NAME,XMLMapperConf.OPTI_PROP_NAME));
+    	sql.add(String.format("and %s=#{%s}", helper.getOptiColumnName(),helper.getOptiPropertyName()));
     	return wrapScript(String.join(lineSeparator, sql));
     }
 
@@ -231,7 +233,7 @@ public class ScriptSqlProvider {
     	}).collect(Collectors.joining(",")));
     	sql.add(String.format("where %s=#{%s,jdbcType=%s}", idRM.getColumn(), idRM.getProperty(),
     			idRM.getJdbcType()));
-    	sql.add(String.format("and %s=#{%s}", XMLMapperConf.OPTI_COLUMN_NAME,XMLMapperConf.OPTI_PROP_NAME));
+    	sql.add(String.format("and %s=#{%s}", helper.getOptiColumnName(),helper.getOptiPropertyName()));
     	return wrapScript(String.join(lineSeparator, sql));
     }
 
