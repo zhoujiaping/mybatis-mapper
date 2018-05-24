@@ -9,11 +9,11 @@
 		<jdbcConnection driverClass="org.postgresql.Driver"
 			connectionURL="jdbc:postgresql://localhost:5432/test" userId="postgres"
 			password="123456" />
-		<javaModelGenerator targetPackage="cn.howso.mybatis.model"
+		<javaModelGenerator targetPackage="cn.sirenia.mybatis.model"
 			targetProject="D:\mybatis" />
-		<sqlMapGenerator targetPackage="cn.howso.mybatis.mapper.xml"
+		<sqlMapGenerator targetPackage="cn.sirenia.mybatis.mapper.xml"
 			targetProject="D:\mybatis" />
-		<javaClientGenerator targetPackage="cn.howso.mybatis.mapper"
+		<javaClientGenerator targetPackage="cn.sirenia.mybatis.mapper"
 			targetProject="D:\mybatis" type="XMLMAPPER" />
 		<table tableName="sys_user" domainObjectName="User"
 			enableCountByExample="true" enableDeleteByExample="true"

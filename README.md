@@ -5,7 +5,7 @@
 办法，使用maven插件mybatis-generator。使用一段时间之后，发现还是不能令人满意。每次修改表结构，都要重新生成代码。
 还要把自定义的代码和自动生成的代码手工合并到一起。并且自动生成的代码体积庞大，结构相同。开始怀念hibernate，but，问题
 还是需要解决的。于是阅读mybatis的源码，设计一个能够自动生成通用sql、又能够将通用sql和手写的sql分离的解决方案。经历过好
-几个版本的迭代，当前版本已经在生产环境可用了。
+几个版本的迭代，当前版本已经在生产环境可用了。(sirenia是一个金属乐队，是海妖的意思)
 ## 该项目主要提供：
 
 1. mybatis分页查询插件以及分页参数和结果的封装
@@ -20,6 +20,7 @@
 
 2. mybatis单表CURD通用dao
     * int countByExample(EXAMPLE example);//example是查询条件的封装，支持mybatis-generator的Example以及该项目中自定义的Example。
+    * int countByExample(EXAMPLE example);
     * int deleteByExample(EXAMPLE example);
     * int insert(ENTITY record);
     * int insertSelective(ENTITY record);
@@ -31,9 +32,13 @@
     * int batchInsert(@Param("recordList") List<ENTITY> recordList);
     * int batchInsertSelective(@Param("recordList") List<ENTITY> recordList);
     * int deleteByPrimaryKey(@Param("id") PK id);// @Param("id")不要删除，约定名称为传参名为id，这样简单方便。
+    * int deleteByPrimaryKeyAndOptiVersion(@Param("id") PK id,@Param("optiVersion")long optiVersion);// @Param("id")不要删除，约定名称为传参名为id，这样简单方便。
+    
     * ENTITY selectByPrimaryKey(@Param("id") PK id);// @Param("id")不要删除，约定名称为传参名为id，这样简单方便。
     * int updateByPrimaryKeySelective(ENTITY record);
+    * int updateByPrimaryKeyAndOptiVersionSelective(ENTITY record);
     * int updateByPrimaryKey(ENTITY record);
+	  * int updateByPrimaryKeyAndOptiVersion(ENTITY record);
     * PK selectKey();
 	
 3. 通用dao支持两种查询条件的封装方式；

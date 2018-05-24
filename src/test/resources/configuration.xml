@@ -16,13 +16,13 @@ PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
 	<typeAliases>
 	</typeAliases>
 	<plugins>
-		<plugin interceptor="cn.howso.mybatis.plugin.ExecutorPlugin">
+		<plugin interceptor="cn.sirenia.mybatis.plugin.ExecutorPlugin">
 			<!-- 方言 -->
 			<property name="dialect" value="postgresql" />
 			<!-- 乐观锁列名 -->
 			<property name="optiColumnName" value="version"/>
 		</plugin>
-		<plugin interceptor="cn.howso.mybatis.plugin.PagePlugin">
+		<plugin interceptor="cn.sirenia.mybatis.plugin.PagePlugin">
 			<property name="dialect" value="postgresql" />
 			<property name="pageSqlId" value=".*ByPage.*" />
 		</plugin>
@@ -39,6 +39,6 @@ PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
 		</environment>
 	</environments>
 	<mappers>
-		<mapper resource="cn/howso/mybatis/mapper/xml/UserMapper.xml" />
+		<mapper resource="cn/sirenia/mybatis/mapper/xml/UserMapper.xml" />
 	</mappers>
 </configuration>

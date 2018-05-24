@@ -2,7 +2,7 @@
 以前写过一个版本的mybatis单表操作的通用dao，实现需要修改mybatis的源代码。
 但是修改mybatis源码容易引入风险。
 本项目的目的是在不修改源码的情况下，实现通用dao。
-实现方式是基于mybatis插件的方式,参考cn.howso.mybatis.plugin.ExecutorPlugin。
+实现方式是基于mybatis插件的方式,参考cn.sirenia.mybatis.plugin.ExecutorPlugin。
 主要目的是将XXXMapper.xml中对于单表增删改查的配置去掉，使配置文件简化，模板化的代码尽可能不重复出现。
 好处：
 一致的mapper接口。
@@ -20,7 +20,7 @@
 可以通过mybatis-generator插件根据表自动生成，也可以手写，或者通过其他工具生成，不管怎么样，反正需要一个对应的model类。
 当然也有人成为pojo、bean，不论它叫什么，它的字段和表字段对应，然后有对应的getters和setters就够了。
 如
-package cn.howso.deeplan.perm.model;
+package cn.sirenia.deeplan.perm.model;
 public class User{
 	...字段
 	...getters
@@ -31,8 +31,8 @@ public class User{
 其中的内容如下
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="cn.howso.deeplan.perm.mapper.UserMapper" >
-  <resultMap id="BaseResultMap" type="cn.howso.deeplan.perm.model.User" >
+<mapper namespace="cn.sirenia.deeplan.perm.mapper.UserMapper" >
+  <resultMap id="BaseResultMap" type="cn.sirenia.deeplan.perm.model.User" >
     <id column="id" property="id" jdbcType="INTEGER" />
     <result column="name" property="name" jdbcType="VARCHAR" />
     <result column="password" property="password" jdbcType="VARCHAR" />
@@ -47,10 +47,10 @@ public class User{
 使用单表操作方法时需要的样例类（支持mybatis-generator生成的XXXExample，也支持该项目提供的通用Example）、
 主键的类型（如果没有主键，就随便给个类型，一般没有主键就用Object）。
 Table注解，指明了该Mapper操作的表名。（为什么不加在实体类中？我们待会儿解释）
-import cn.howso.deeplan.perm.model.User;
-import cn.howso.mybatis.anno.Table;
-import cn.howso.mybatis.mapper.BaseMapper;
-import cn.howso.mybatis.model.Example;
+import cn.sirenia.deeplan.perm.model.User;
+import cn.sirenia.mybatis.anno.Table;
+import cn.sirenia.mybatis.mapper.BaseMapper;
+import cn.sirenia.mybatis.model.Example;
 @Table(name="sys_user")
 public interface UserMapper extends BaseMapper<User,Example,Integer>{
 	//对于基本的单表CURD，不需要写方法。
@@ -58,9 +58,9 @@ public interface UserMapper extends BaseMapper<User,Example,Integer>{
 你可能在想，还不如使用maven的mybatis-generator插件。别急，先跟着把例子做完。
 4、配置mybatis单表操作的插件。可以参考mybatis官网。
 <plugins>
-	<plugin interceptor="cn.howso.mybatis.plugin.ExecutorPlugin">
+	<plugin interceptor="cn.sirenia.mybatis.plugin.ExecutorPlugin">
 	</plugin>
-	<!--<plugin interceptor="cn.howso.mybatis.plugin.PagePlugin">
+	<!--<plugin interceptor="cn.sirenia.mybatis.plugin.PagePlugin">
 		<property name="dialect" value="postgre" />
 		<property name="pageSqlId" value=".*ByPage.*" />
 	</plugin>-->
@@ -113,7 +113,7 @@ XXXMapper.xml中写的sql，尽可能面向某一张表。不要在其中查询�
 如果你的需求只有基本的单表CURD，那么XXXMapper.xml的内容只剩下
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="cn.howso.deeplan.perm.mapper.UserMapper" >
+<mapper namespace="cn.sirenia.deeplan.perm.mapper.UserMapper" >
 </mapper>
 然而基本的CURD功能却依然可以用。
 
@@ -121,7 +121,7 @@ XXXMapper.xml中写的sql，尽可能面向某一张表。不要在其中查询�
 分页插件是从网上找的，后来自己进行了一些改造。
 要使用分页功能，需要在mybatis的配置文件中配置
 <plugins>
-	<plugin interceptor="cn.howso.mybatis.plugin.PagePlugin">
+	<plugin interceptor="cn.sirenia.mybatis.plugin.PagePlugin">
 		<property name="dialect" value="postgre" />
 		<property name="pageSqlId" value=".*ByPage.*" />
 	</plugin>
@@ -154,7 +154,7 @@ BaseMapper中的*ByPage方法需要分页插件的支持。
 这个支持，是基于和spring整合的。
 需要修改application-mybatis.xml中的SqlSessionFactoryBean和MapperScannerConfigurer配置。
 如下
-<bean id="sqlSessionFactory" class="cn.howso.mybatis.builder.MySqlSessionFactoryBean">
+<bean id="sqlSessionFactory" class="cn.sirenia.mybatis.builder.MySqlSessionFactoryBean">
 	<property name="dataSource" ref="dataSrouce" />
 	<property name="configLocation" value="classpath:sql-map-config.xml"/>
 	<property name="mapperLocations">
@@ -165,10 +165,10 @@ BaseMapper中的*ByPage方法需要分页插件的支持。
 	</property>
 </bean>
 <!-- 扫描 basePackage下所有的接口，根据对应的mapper.xml为其生成代理类 -->
-<bean class="cn.howso.mybatis.builder.MyMapperScannerConfigurer">
+<bean class="cn.sirenia.mybatis.builder.MyMapperScannerConfigurer">
 	<property name="sqlSessionFactoryBeanName" value="sqlSessionFactory" />
-	<property name="annotationClass" value="cn.howso.mybatis.anno.Table"></property>
-	<property name="basePackage" value="cn.howso.**.mapper" />
+	<property name="annotationClass" value="cn.sirenia.mybatis.anno.Table"></property>
+	<property name="basePackage" value="cn.sirenia.**.mapper" />
 </bean>
 这样，在mybatis启动的时候，就会在XXXMapper.xml不存在的时候，自动使用默认的内容提供给mybatis。
 当您有个性化的需求，需要自己写sql时，可以把XXXMapper.xml补上，而不需要修改配置和代码。
