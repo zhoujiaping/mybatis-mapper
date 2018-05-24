@@ -3,6 +3,8 @@ package cn.sirenia.mybatis.util;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import org.apache.ibatis.mapping.ResultMapping;
@@ -68,11 +70,19 @@ public class ScriptSqlProvider {
         //getMappedColumns和getResultMappings的字段顺序不是一致的。
         List<String> sql = new ArrayList<>();
         sql.add("insert into " + helper.getTablename());
-        sql.add(helper.getResultMappings().stream().map(item->item.getColumn()).collect(Collectors.joining(",", "(", ")")));
+        sql.add(helper.getResultMappings().stream().map(new Function<ResultMapping, String>() {
+			@Override
+			public String apply(ResultMapping item) {
+				return item.getColumn();
+			}
+		}).collect(Collectors.joining(",", "(", ")")));
         sql.add("values ");
-        sql.add(helper.getResultMappings().stream().map(mapping -> {
-            return "#{" + mapping.getProperty() + ",jdbcType=" + mapping.getJdbcType() + "}";
-        }).collect(Collectors.joining(",", "(", ")")));
+        sql.add(helper.getResultMappings().stream().map(new Function<ResultMapping, String>() {
+			@Override
+			public String apply(ResultMapping mapping) {
+				return "#{" + mapping.getProperty() + ",jdbcType=" + mapping.getJdbcType() + "}";
+			}
+		}).collect(Collectors.joining(",", "(", ")")));
         return wrapScript(String.join(lineSeparator, sql));
     }
 
@@ -80,15 +90,21 @@ public class ScriptSqlProvider {
         List<String> sql = new ArrayList<>();
         sql.add("insert into " + helper.getTablename());
         sql.add("<trim prefix='(' suffix=')' suffixOverrides=','>");
-        sql.add(helper.getResultMappings().stream().map(mapping -> {
-            return String.format("<if test='%s != null'>%s,</if>", mapping.getProperty(), mapping.getColumn());
-        }).collect(Collectors.joining(lineSeparator)));
+        sql.add(helper.getResultMappings().stream().map(new Function<ResultMapping, String>() {
+			@Override
+			public String apply(ResultMapping mapping) {
+				return String.format("<if test='%s != null'>%s,</if>", mapping.getProperty(), mapping.getColumn());
+			}
+		}).collect(Collectors.joining(lineSeparator)));
         sql.add("</trim>");
         sql.add("<trim prefix='values (' suffix=')' suffixOverrides=','>");
-        sql.add(helper.getResultMappings().stream().map(mapping -> {
-            return String.format("<if test='%s != null'>#{%s,jdbcType=%s},</if>", mapping.getProperty(),
-                    mapping.getProperty(), mapping.getJdbcType());
-        }).collect(Collectors.joining(lineSeparator)));
+        sql.add(helper.getResultMappings().stream().map(new Function<ResultMapping, String>() {
+			@Override
+			public String apply(ResultMapping mapping) {
+				return String.format("<if test='%s != null'>#{%s,jdbcType=%s},</if>", mapping.getProperty(),
+	                    mapping.getProperty(), mapping.getJdbcType());
+			}
+		}).collect(Collectors.joining(lineSeparator)));
         sql.add("</trim>");
         return wrapScript(String.join(lineSeparator, sql));
     }
@@ -134,13 +150,13 @@ public class ScriptSqlProvider {
         List<String> sql = new ArrayList<>();
         sql.add("update " + helper.getTablename());
         sql.add("<set>");
-        sql.add(helper.getResultMappings().stream().map(mapping -> {
-        	/*if(helper.isEnableOptimisticLock() && isOptiMapping(mapping)){
-        		return getOptiColumnSetter();
-        	}*/
-            return String.format("<if test='record.%s != null'>%s=#{record.%s,jdbcType=%s},</if>",
-                    mapping.getProperty(), mapping.getColumn(), mapping.getProperty(), mapping.getJdbcType());
-        }).collect(Collectors.joining(lineSeparator)));
+        sql.add(helper.getResultMappings().stream().map(new Function<ResultMapping, String>() {
+			@Override
+			public String apply(ResultMapping mapping) {
+				return String.format("<if test='record.%s != null'>%s=#{record.%s,jdbcType=%s},</if>",
+	                    mapping.getProperty(), mapping.getColumn(), mapping.getProperty(), mapping.getJdbcType());
+			}
+		}).collect(Collectors.joining(lineSeparator)));
         sql.add("</set>");
         sql.add("<if test='_parameter != null'>");
         sql.add(exampleWhereClause(helper));
@@ -152,13 +168,13 @@ public class ScriptSqlProvider {
         List<String> sql = new ArrayList<>();
         sql.add("update " + helper.getTablename());
         sql.add(" set ");
-        sql.add(helper.getResultMappings().stream().map(mapping -> {
-        	/*if(helper.isEnableOptimisticLock() && isOptiMapping(mapping)){
-        		return getOptiColumnSetter();
-        	}*/
-            return String.format("%s = #{record.%s,jdbcType=%s}", mapping.getColumn(), mapping.getProperty(),
-                    mapping.getJdbcType());
-        }).collect(Collectors.joining("," + lineSeparator)));
+        sql.add(helper.getResultMappings().stream().map(new Function<ResultMapping, String>() {
+			@Override
+			public String apply(ResultMapping mapping) {
+				 return String.format("%s = #{record.%s,jdbcType=%s}", mapping.getColumn(), mapping.getProperty(),
+		                    mapping.getJdbcType());
+			}
+		}).collect(Collectors.joining("," + lineSeparator)));
         sql.add(" <if test='_parameter != null'>");
         sql.add(exampleWhereClause(helper));
         sql.add("</if>");
@@ -171,13 +187,18 @@ public class ScriptSqlProvider {
         ResultMapping idRM = helper.getIdResultMapping();
         sql.add("update " + helper.getTablename());
         sql.add("<set>");
-        sql.add(helper.getResultMappings().stream().filter(mapping->!mapping.getColumn().equals(idRM.getColumn())).map(mapping -> {
-        	/*if(helper.isEnableOptimisticLock() && isOptiMapping(mapping)){
-        		return getOptiColumnSetter();
-        	}*/
-            return String.format("<if test='%s != null'>%s = #{%s,jdbcType=%s},</if>",
-                    mapping.getProperty(), mapping.getColumn(), mapping.getProperty(), mapping.getJdbcType());
-        }).collect(Collectors.joining(lineSeparator)));
+        sql.add(helper.getResultMappings().stream().filter(new Predicate<ResultMapping>(){
+			@Override
+			public boolean test(ResultMapping mapping) {
+				return !mapping.getColumn().equals(idRM.getColumn());
+			}
+        }).map(new Function<ResultMapping, String>() {
+			@Override
+			public String apply(ResultMapping mapping) {
+				return String.format("<if test='%s != null'>%s = #{%s,jdbcType=%s},</if>",
+	                    mapping.getProperty(), mapping.getColumn(), mapping.getProperty(), mapping.getJdbcType());
+			}
+		}).collect(Collectors.joining(lineSeparator)));
         sql.add("</set>");
         sql.add(String.format("where %s=#{%s,jdbcType=%s}", idRM.getColumn(), idRM.getProperty(),
                 idRM.getJdbcType()));
@@ -189,13 +210,18 @@ public class ScriptSqlProvider {
     	ResultMapping idRM = helper.getIdResultMapping();
     	sql.add("update " + helper.getTablename());
     	sql.add("<set>");
-    	sql.add(helper.getResultMappings().stream().filter(mapping->!mapping.getColumn().equals(idRM.getColumn())).map(mapping -> {
-    		/*if(helper.isEnableOptimisticLock() && isOptiMapping(mapping)){
-    			return getOptiColumnSetter();
-    		}*/
-    		return String.format("<if test='%s != null'>%s = #{%s,jdbcType=%s},</if>",
-    				mapping.getProperty(), mapping.getColumn(), mapping.getProperty(), mapping.getJdbcType());
-    	}).collect(Collectors.joining(lineSeparator)));
+    	sql.add(helper.getResultMappings().stream().filter(new Predicate<ResultMapping>(){
+			@Override
+			public boolean test(ResultMapping mapping) {
+				return !mapping.getColumn().equals(idRM.getColumn());
+			}
+        }).map(new Function<ResultMapping, String>() {
+			@Override
+			public String apply(ResultMapping mapping) {
+				return String.format("<if test='%s != null'>%s = #{%s,jdbcType=%s},</if>",
+	    				mapping.getProperty(), mapping.getColumn(), mapping.getProperty(), mapping.getJdbcType());
+			}
+		}).collect(Collectors.joining(lineSeparator)));
     	sql.add("</set>");
     	sql.add(String.format("where %s=#{%s,jdbcType=%s}", idRM.getColumn(), idRM.getProperty(),
     			idRM.getJdbcType()));
@@ -208,13 +234,13 @@ public class ScriptSqlProvider {
         ResultMapping idRM = helper.getIdResultMapping();
         sql.add("update " + helper.getTablename());
         sql.add(" set ");
-        sql.add(helper.getResultMappings().stream().map(mapping -> {
-        	/*if(helper.isEnableOptimisticLock() && isOptiMapping(mapping)){
-        		return getOptiColumnSetter();
-        	}*/
-            return String.format("%s = #{%s,jdbcType=%s}", mapping.getColumn(), mapping.getProperty(),
-                    mapping.getJdbcType());
-        }).collect(Collectors.joining(",")));
+        sql.add(helper.getResultMappings().stream().map(new Function<ResultMapping, String>() {
+			@Override
+			public String apply(ResultMapping mapping) {
+				return String.format("%s = #{%s,jdbcType=%s}", mapping.getColumn(), mapping.getProperty(),
+	                    mapping.getJdbcType());
+			}
+		}).collect(Collectors.joining(",")));
         sql.add(String.format("where %s=#{%s,jdbcType=%s}", idRM.getColumn(), idRM.getProperty(),
                 idRM.getJdbcType()));
         return wrapScript(String.join(lineSeparator, sql));
@@ -224,13 +250,13 @@ public class ScriptSqlProvider {
     	ResultMapping idRM = helper.getIdResultMapping();
     	sql.add("update " + helper.getTablename());
     	sql.add(" set ");
-    	sql.add(helper.getResultMappings().stream().map(mapping -> {
-    		/*if(helper.isEnableOptimisticLock() && isOptiMapping(mapping)){
-        		return getOptiColumnSetter();
-        	}*/
-    		return String.format("%s = #{%s,jdbcType=%s}", mapping.getColumn(), mapping.getProperty(),
-    				mapping.getJdbcType());
-    	}).collect(Collectors.joining(",")));
+    	sql.add(helper.getResultMappings().stream().map(new Function<ResultMapping, String>() {
+			@Override
+			public String apply(ResultMapping mapping) {
+				return String.format("%s = #{%s,jdbcType=%s}", mapping.getColumn(), mapping.getProperty(),
+	    				mapping.getJdbcType());
+			}
+		}).collect(Collectors.joining(",")));
     	sql.add(String.format("where %s=#{%s,jdbcType=%s}", idRM.getColumn(), idRM.getProperty(),
     			idRM.getJdbcType()));
     	sql.add(String.format("and %s=#{%s}", helper.getOptiColumnName(),helper.getOptiPropertyName()));
@@ -260,12 +286,20 @@ public class ScriptSqlProvider {
     public String batchInsert(XMLMapperConf helper) {
         List<String> sql = new ArrayList<>();
         sql.add("insert into " + helper.getTablename());
-        sql.add(helper.getResultMappings().stream().map(item->item.getColumn()).collect(Collectors.joining(",","(",")")));
+        sql.add(helper.getResultMappings().stream().map(new Function<ResultMapping, String>() {
+			@Override
+			public String apply(ResultMapping mapping) {
+				return mapping.getColumn();
+			}
+		}).collect(Collectors.joining(",","(",")")));
         sql.add("values");
         sql.add("<foreach collection='recordList' item='record' separator=','>");
-        sql.add(helper.getResultMappings().stream().map(mapping -> {
-            return String.format("#{record.%s,jdbcType=%s}", mapping.getProperty(), mapping.getJdbcType());
-        }).collect(Collectors.joining(",", "(", ")")));
+        sql.add(helper.getResultMappings().stream().map(new Function<ResultMapping, String>() {
+			@Override
+			public String apply(ResultMapping mapping) {
+				return String.format("#{record.%s,jdbcType=%s}", mapping.getProperty(), mapping.getJdbcType());
+			}
+		}).collect(Collectors.joining(",", "(", ")")));
         sql.add("</foreach>");
         return wrapScript(String.join(lineSeparator, sql));
     }
@@ -278,39 +312,28 @@ public class ScriptSqlProvider {
         List<String> sql = new ArrayList<>();
         sql.add("insert into " + helper.getTablename());
         sql.add("<trim prefix='(' suffix=')' suffixOverrides=','>");
-        sql.add(helper.getResultMappings().stream().map(mapping -> {
-            return String.format("<if test='recordList[0].%s != null'>%s,</if>", mapping.getProperty(),
-                    mapping.getColumn());
-        }).collect(Collectors.joining(lineSeparator)));
+        sql.add(helper.getResultMappings().stream().map(new Function<ResultMapping, String>() {
+			@Override
+			public String apply(ResultMapping mapping) {
+				return String.format("<if test='recordList[0].%s != null'>%s,</if>", mapping.getProperty(),
+	                    mapping.getColumn());
+			}
+		}).collect(Collectors.joining(lineSeparator)));
         sql.add("</trim>");
         sql.add("values");
         sql.add("<foreach collection='recordList' item='record' separator=','>");
         sql.add("<trim prefix='(' suffix=')' suffixOverrides=','>");
-        sql.add(helper.getResultMappings().stream().map(mapping -> {
-            return String.format("<if test='recordList[0].%s != null'>#{record.%s,jdbcType=%s},</if>", mapping.getProperty(),
-                    mapping.getProperty(), mapping.getJdbcType());
-        }).collect(Collectors.joining(lineSeparator)));
+        sql.add(helper.getResultMappings().stream().map(new Function<ResultMapping, String>() {
+			@Override
+			public String apply(ResultMapping mapping) {
+				  return String.format("<if test='recordList[0].%s != null'>#{record.%s,jdbcType=%s},</if>", mapping.getProperty(),
+		                    mapping.getProperty(), mapping.getJdbcType());
+			}
+		}).collect(Collectors.joining(lineSeparator)));
         sql.add("</trim>");
         sql.add("</foreach>");
         return wrapScript(String.join(lineSeparator, sql));
     }
-
-    /*public String insertSelectiveSelectKey(XMLMapperConf helper){
-        List<String> sql = new ArrayList<>();
-        sql.add("insert into " + helper.getTablename());
-        sql.add("<trim prefix='(' suffix=')' suffixOverrides=','>");
-        sql.add(helper.getResultMappings().stream().map(mapping -> {
-            return String.format("<if test='%s != null'>%s,</if>", mapping.getProperty(), mapping.getColumn());
-        }).collect(Collectors.joining(lineSeparator)));
-        sql.add("</trim>");
-        sql.add("<trim prefix='values (' suffix=')' suffixOverrides=','>");
-        sql.add(helper.getResultMappings().stream().map(mapping -> {
-            return String.format("<if test='%s != null'>#{%s,jdbcType=%s},</if>", mapping.getProperty(),
-                    mapping.getProperty(), mapping.getJdbcType());
-        }).collect(Collectors.joining(lineSeparator)));
-        sql.add("</trim>");
-        return wrapScript(String.join(lineSeparator, sql));
-    }*/
     public String selectKey(XMLMapperConf helper){
         List<String> sql = new ArrayList<>();
         String pkType = helper.getIdResultMapping().getJavaType().getSimpleName();
