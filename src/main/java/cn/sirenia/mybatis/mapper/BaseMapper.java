@@ -10,14 +10,15 @@ import org.apache.ibatis.annotations.ResultType;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
-import cn.sirenia.mybatis.model.Pageable;
+import cn.sirenia.mybatis.plugin.model.Pageable;
+
 
 /**
  * 通用mapper接口，子接口只要继承该接口并添加一个说明表名的注解， 即可获得单表增、删、查、改、批量增删改、分页查、按example查等多种方法。
  */
 public interface BaseMapper<ENTITY, EXAMPLE, PK>{
 
-	@ResultType(Integer.class)
+    @ResultType(Integer.class)
     @Select("sirenia-countByExample")
     int countByExample(EXAMPLE example);
 
@@ -64,9 +65,10 @@ public interface BaseMapper<ENTITY, EXAMPLE, PK>{
     @ResultType(Integer.class)
     @Delete("sirenia-deleteByPrimaryKey")
     int deleteByPrimaryKey(@Param("id") PK id);// @Param("id")不要删除，约定名称为传参名为id，这样简单方便。
+    
     @ResultType(Integer.class)
-    @Delete("sirenia-deleteByPrimaryKeyAndOptiVersion")
-    int deleteByPrimaryKeyAndOptiVersion(@Param("id") PK id,@Param("optiVersion")long optiVersion);// @Param("id")不要删除，约定名称为传参名为id，这样简单方便。
+    @Delete("sirenia-deleteByPrimaryKeyAndVersion")
+    int deleteByPrimaryKeyAndVersion(@Param("id") PK id,@Param("version")Integer version);// @Param("id")不要删除，约定名称为传参名为id，这样简单方便。
 
     @ResultMap("BaseResultMap")
     @Select("sirenia-selectByPrimaryKey")
@@ -75,16 +77,19 @@ public interface BaseMapper<ENTITY, EXAMPLE, PK>{
     @ResultType(Integer.class)
     @Update("sirenia-updateByPrimaryKeySelective")
     int updateByPrimaryKeySelective(ENTITY record);
+    
     @ResultType(Integer.class)
-    @Update("sirenia-updateByPrimaryKeyAndOptiVersionSelective")
-    int updateByPrimaryKeyAndOptiVersionSelective(ENTITY record);
+    @Update("sirenia-updateByPrimaryKeySelectiveAndVersion")
+    int updateByPrimaryKeySelectiveAndVersion(ENTITY record);
 
     @ResultType(Integer.class)
     @Update("sirenia-updateByPrimaryKey")
     int updateByPrimaryKey(ENTITY record);
+    
     @ResultType(Integer.class)
-    @Update("sirenia-updateByPrimaryKeyAndOptiVersion")
-    int updateByPrimaryKeyAndOptiVersion(ENTITY record);
+    @Update("sirenia-updateByPrimaryKeyAndVersion")
+    int updateByPrimaryKeyAndVersion(ENTITY record);
+
     /*@ResultType(Integer.class)
     @SelectKey(before=true,keyColumn="id",resultType=Integer.class,statement="select nextVal('sys_user_id_seq')", keyProperty = "id")
     @Insert("sirenia-insertSelectiveSelectKey")

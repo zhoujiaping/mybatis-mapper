@@ -1,7 +1,13 @@
-package cn.sirenia.mybatis.model;
+package cn.sirenia.mybatis.plugin.model;
 
-public abstract class Pageable {
-    protected int total; 
+import java.io.Serializable;
+
+public abstract class Pageable implements Serializable{
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	protected int total; 
     public void setTotal(int total){
         this.total = total;
     }
@@ -13,17 +19,17 @@ public abstract class Pageable {
 
     public String createPageSql(String sql, String dialect, int limit, int offset) {
         StringBuffer pageSql = new StringBuffer();
-        if ("mysql".equals(dialect)) {
+        if (dialect.startsWith("mysql")) {
             pageSql.append(sql);
             pageSql.append(" limit " + offset + "," + limit);
-        } else if ("oracle".equals(dialect)) {
+        } else if (dialect.startsWith("oracle")) {
             pageSql.append("select * from (select tmp_tb.*,ROWNUM row_id from (");
             pageSql.append(sql);
             pageSql.append(") as tmp_tb where ROWNUM<=");
             pageSql.append(offset + limit);
             pageSql.append(") where row_id>");
             pageSql.append(offset);
-        } else if ("postgresql".equals(dialect)) {
+        } else if (dialect.startsWith("postgre")) {
             pageSql.append(sql);
             pageSql.append(" limit " + limit + " offset  " + offset);
         }

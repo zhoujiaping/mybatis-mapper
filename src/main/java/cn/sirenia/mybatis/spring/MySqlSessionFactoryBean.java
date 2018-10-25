@@ -1,4 +1,4 @@
-package cn.sirenia.mybatis.builder;
+package cn.sirenia.mybatis.spring;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;

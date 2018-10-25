@@ -1,8 +1,14 @@
-package cn.sirenia.mybatis.model;
+package cn.sirenia.mybatis.plugin.model;
 
-public class LimitPage extends Pageable{
+import java.io.Serializable;
 
-    private int limit = 20; // 每页显示记录数
+public class LimitPage extends Pageable implements Serializable{
+
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	private int limit = 20; // 每页显示记录数
     private int offset = 0; // 每页显示记录数
 
     public static LimitPage of(int limit,int offset){

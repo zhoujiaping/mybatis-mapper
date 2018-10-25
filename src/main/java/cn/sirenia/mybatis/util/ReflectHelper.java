@@ -1,13 +1,15 @@
 package cn.sirenia.mybatis.util;
 
-
 import java.lang.reflect.Field;
 
-/**  
-* <p>反射的方法类</p>
-* @author wzf
-* @date 2016年3月15日 上午9:46:34 
-*/ 
+/**
+ * <p>
+ * 反射的方法类
+ * </p>
+ * 
+ * @author wzf
+ * @date 2016年3月15日 上午9:46:34
+ */
 public class ReflectHelper {
 	/**
 	 * 获取obj对象fieldName的Field
@@ -39,8 +41,7 @@ public class ReflectHelper {
 	 * @throws IllegalAccessException
 	 */
 	public static Object getValueByFieldName(Object obj, String fieldName)
-			throws SecurityException, NoSuchFieldException,
-			IllegalArgumentException, IllegalAccessException {
+			throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
 		Field field = getFieldByFieldName(obj, fieldName);
 		Object value = null;
 		if (field != null) {
@@ -66,9 +67,8 @@ public class ReflectHelper {
 	 * @throws IllegalArgumentException
 	 * @throws IllegalAccessException
 	 */
-	public static void setValueByFieldName(Object obj, String fieldName,
-			Object value) throws SecurityException, NoSuchFieldException,
-			IllegalArgumentException, IllegalAccessException {
+	public static void setValueByFieldName(Object obj, String fieldName, Object value)
+			throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
 		Field field = obj.getClass().getDeclaredField(fieldName);
 		if (field.isAccessible()) {
 			field.set(obj, value);
@@ -77,5 +77,19 @@ public class ReflectHelper {
 			field.set(obj, value);
 			field.setAccessible(false);
 		}
+	}
+
+	// 处理有多个插件时的情况
+	public static Object unwrapProxys(Object target) throws Exception {
+		boolean isProxy = false;
+		do {
+			Class<?> targetClazz = target.getClass();
+			isProxy = targetClazz.getName().startsWith("com.sun.proxy.$Proxy");
+			if (isProxy) {
+				target = ReflectHelper.getValueByFieldName(target, "h");
+				target = ReflectHelper.getValueByFieldName(target, "target");
+			}
+		} while (isProxy);
+		return target;
 	}
 }

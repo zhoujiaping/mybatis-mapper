@@ -1,4 +1,4 @@
-package cn.sirenia.mybatis.model;
+package cn.sirenia.mybatis.plugin.model;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,16 +1,18 @@
-package cn.sirenia.mybatis.model;
+package cn.sirenia.mybatis.plugin.model;
+
+import java.io.Serializable;
 
 /**
- * <p>
  * mybatis的分页插件需要的model
- * </p>
- * 
- * @author wzf
- * @date 2016年3月15日 上午9:16:24
  */
-public class IndexPage extends Pageable{
+public class IndexPage extends Pageable implements Serializable{
 
-    /** 当前页,从1开始 */
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/** 当前页,从1开始 */
     private int index;
 
     /** 每页显示记录数 */

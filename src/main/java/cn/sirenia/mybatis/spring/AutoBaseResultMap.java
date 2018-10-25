@@ -1,4 +1,4 @@
-package cn.sirenia.mybatis.anno;
+package cn.sirenia.mybatis.spring;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

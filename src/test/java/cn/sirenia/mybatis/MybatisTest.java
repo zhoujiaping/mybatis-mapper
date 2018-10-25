@@ -14,16 +14,13 @@ import org.apache.ibatis.session.ResultHandler;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.defaults.DefaultSqlSessionFactory;
-import org.junit.AfterClass;
 import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
 
 import cn.sirenia.mybatis.mapper.UserMapper;
-import cn.sirenia.mybatis.model.Example;
-import cn.sirenia.mybatis.model.IndexPage;
-import cn.sirenia.mybatis.model.PageRes;
 import cn.sirenia.mybatis.model.User;
+import cn.sirenia.mybatis.plugin.model.Example;
+import cn.sirenia.mybatis.plugin.model.IndexPage;
+import cn.sirenia.mybatis.plugin.model.PageRes;
 
 public class MybatisTest {
 

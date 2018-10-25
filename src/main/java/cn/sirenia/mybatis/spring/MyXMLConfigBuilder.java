@@ -1,4 +1,4 @@
-package cn.sirenia.mybatis.builder;
+package cn.sirenia.mybatis.spring;
 import java.io.InputStream;
 import java.io.Reader;
 import java.util.Properties;

@@ -20,9 +20,9 @@ import org.apache.ibatis.plugin.Invocation;
 import org.apache.ibatis.plugin.Plugin;
 import org.apache.ibatis.plugin.Signature;
 
-import cn.sirenia.mybatis.model.Pageable;
+import cn.sirenia.mybatis.plugin.model.Pageable;
 import cn.sirenia.mybatis.util.ReflectHelper;
-
+@Deprecated
 @Intercepts({@Signature(type = StatementHandler.class, method = "prepare", args = {Connection.class}) })
 public class PagePlugin implements Interceptor {
 
