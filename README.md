@@ -12,8 +12,9 @@
     ```
 	public PageRes<User> queryUserByPage(User condition,Pageable page) {
         //...
-        List<User> rows = UserMapper.queryUserByPage(condition ,page);
-        return PageRes.of(rows,page);
+        //List<User> rows = UserMapper.queryUserByPage(condition ,page);
+        //return PageRes.of(rows,page);
+	return userMapper.queryUser(condition, page).getPageRes();
     }
 	```
     Pageable有两个子类LimitPage和IndexPage，分别用于limit-offset方式的分页和index-size方式的分页。
