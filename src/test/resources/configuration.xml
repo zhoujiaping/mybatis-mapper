@@ -16,10 +16,12 @@ PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
 	<typeAliases>
 	</typeAliases>
 	<plugins>
-		<plugin interceptor="cn.sirenia.mybatis.plugin.AutoSqlExecutorPlugin">
-			<!-- 方言 -->
-			<property name="dialect" value="postgresql" />
+		<plugin interceptor="cn.sirenia.mybatis.plugin.TwPlugin">
 		</plugin>
+		<!-- <plugin interceptor="cn.sirenia.mybatis.plugin.AutoSqlExecutorPlugin">
+			方言
+			<property name="dialect" value="postgresql" />
+		</plugin> -->
 		<plugin interceptor="cn.sirenia.mybatis.plugin.PageWraperPagePlugin">
 			<property name="dialect" value="postgresql" />
 		</plugin>
@@ -30,12 +32,12 @@ PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
 			<dataSource type="POOLED">
 				<property name="driver" value="org.postgresql.Driver" />
 				<property name="url" value="jdbc:postgresql://localhost:5432/test" />
-				<property name="username" value="postgresql" />
+				<property name="username" value="postgres" />
 				<property name="password" value="123456" />
 			</dataSource>
 		</environment>
 	</environments>
 	<mappers>
-		<mapper resource="cn/sirenia/mybatis/mapper/xml/UserMapper.xml" />
+		<!-- <mapper resource="cn/sirenia/mybatis/mapper/xml/UserMapper.xml" /> -->
 	</mappers>
 </configuration>

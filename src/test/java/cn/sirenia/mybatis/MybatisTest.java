@@ -15,26 +15,32 @@ import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.defaults.DefaultSqlSessionFactory;
 import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 import cn.sirenia.mybatis.mapper.UserMapper;
 import cn.sirenia.mybatis.model.User;
 import cn.sirenia.mybatis.plugin.model.Example;
 import cn.sirenia.mybatis.plugin.model.IndexPage;
 import cn.sirenia.mybatis.plugin.model.PageRes;
+import cn.sirenia.mybatis.registry.MyMapperRegistry;
+import cn.sirenia.mybatis.util.ReflectHelper;
 
 public class MybatisTest {
 
     private static String resource = "configuration.xml";
     private static SqlSessionFactory sqlSessionFactory;
 
-    //@BeforeClass
-    public static void beforeClass() throws IOException {
+    @BeforeClass
+    public static void beforeClass() throws Exception {
         /*
          * 1、建库，执行init-test.sql 2、执行mybatis-generator:generate，拷贝文件到项目对应位置 3、执行测试
          */
         Reader reader = Resources.getResourceAsReader(resource);
         XMLConfigBuilder xMConfigBuilder = new XMLConfigBuilder(reader);
         Configuration configuration = xMConfigBuilder.parse();
+        //替换configuration的mapperRegistry，支持写Mapper的实现类
+        MyMapperRegistry.replaceConfigMapperRegistry(configuration);
         sqlSessionFactory = new DefaultSqlSessionFactory(configuration);
         // SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(reader);
     }
@@ -82,13 +88,14 @@ public class MybatisTest {
         session.close();
     }
 
-    //@Test
+    @Test
     public void insertSelective() {
         SqlSession session = sqlSessionFactory.openSession();
         UserMapper userMapper = session.getMapper(UserMapper.class);
         User record = new User();
-        record.setId(-1);
+        //record.setId(-1);
         record.setName("xiaodao");
+        record.setPassword("123456");
         int count = userMapper.insertSelective(record);
         Assert.assertEquals(count, 1);
         session.rollback();
@@ -227,12 +234,15 @@ public class MybatisTest {
         session.close();
     }
 
-    //@Test
-    public void selectByPrimaryKey() {
+    @Test
+    public void selectByPrimaryKey() throws Exception{
         SqlSession session = sqlSessionFactory.openSession();
         UserMapper userMapper = session.getMapper(UserMapper.class);
-        User user = userMapper.selectByPrimaryKey(1);
-        Assert.assertEquals(user.getId().longValue(), 1);
+        User user = userMapper.selectByPrimaryKey(-1);
+        userMapper.selectByPrimaryKey(-1);
+        userMapper.selectByPrimaryKey(-1);
+        //Assert.assertEquals(user.getId().longValue(), 1);
+        System.out.println(user);
         session.rollback();
         session.close();
     }

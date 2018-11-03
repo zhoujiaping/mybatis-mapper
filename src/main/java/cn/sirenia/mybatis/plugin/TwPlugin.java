@@ -2,6 +2,7 @@ package cn.sirenia.mybatis.plugin;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,15 +34,15 @@ import cn.sirenia.mybatis.util.XMLMapperConf;
 		@Signature(type = Executor.class, method = "query", args = { MappedStatement.class, Object.class,
 				RowBounds.class, ResultHandler.class }),
 		@Signature(type = Executor.class, method = "update", args = { MappedStatement.class, Object.class }) })
-//AutoSqlExecutorPlugin2的另一种实现方式，这个类改的是SqlSource
-public class AutoSqlExecutorPlugin implements Interceptor {
+//AutoSqlExecutorPlugin的另一种实现方式，这个类改的是MappedStatement
+public class TwPlugin implements Interceptor {
 
 	// private static final Logger logger =
 	// Logger.getLogger(ExecutorPlugin.class);
-	private String dialect = ""; // 数据库方言
+	private String dialect = "postgresql"; // 数据库方言
 	private final Map<String, Method> providerMethodMap = new HashMap<>();
 	{
-		Method[] methods = ScriptSqlGenerator.class.getMethods();
+		Method[] methods = TwSqlProvider.class.getMethods();
 		for (Method m : methods) {
 			providerMethodMap.put(m.getName(), m);
 		}
@@ -60,19 +61,30 @@ public class AutoSqlExecutorPlugin implements Interceptor {
 		if (("sirenia-" + methodName).equals(sql)) {// 只有第一次会执行，因为执行一次后sql语句已经被改变。
 			synchronized (this) {
 				if (("sirenia-" + methodName).equals(sql)) {
+					//动态创建sql
 					String mapperClazzName = statementId.substring(0, index);
-					ScriptSqlGenerator provider = new ScriptSqlGenerator();
+					TwSqlProvider provider = new TwSqlProvider();
 					Method method = providerMethodMap.get(methodName);
-					String script = (String) method.invoke(provider, XMLMapperConf.of(configuration, mapperClazzName,dialect));
-					// 不支持写<selectKey>，不支持<include>
-					// "<script>select * from sys_user <where> 1=1</where>order
-					// by #{orderByClause}</script>";
 					Class<?> paramClazz = parameterObject == null ? null : parameterObject.getClass();
-					SqlSource dynamicSqlSource = new XMLLanguageDriver().createSqlSource(configuration, script,
+					String script = null;
+					try{
+						TwSqlProvider.tl.set(XMLMapperConf.of(configuration, mapperClazzName,dialect));
+						script = (String) method.invoke(provider);
+					}finally{
+						TwSqlProvider.tl.remove();
+					}
+					//构建MappedStatement
+					SqlSource sqlSource = new XMLLanguageDriver().createSqlSource(configuration, script.toString(),
 							paramClazz);
-					// String msg = "sql for %s is %s,replaced by\r\n%s";
-					// logger.debug(String.format(msg, statementId,sql,script));
-					ReflectHelper.setValueByFieldName(statement, "sqlSource", dynamicSqlSource);
+					SqlCommandType sqlCommandType = statement.getSqlCommandType();
+					MappedStatement ms = new MappedStatement.Builder(configuration, statementId, sqlSource, sqlCommandType )
+							.resultMaps(statement.getResultMaps() ).build();
+					Map<String, MappedStatement> mappedStatements = (Map<String, MappedStatement>) ReflectHelper.getValueByFieldName(configuration, "mappedStatements");
+					//以后执行使用新的MappedStatement
+					mappedStatements.remove(statementId);
+					mappedStatements.put(statementId, ms);
+					//本次执行也要使用新的MappedStatement
+					args[0] = ms;
 				}
 			}
 		}
@@ -84,13 +96,9 @@ public class AutoSqlExecutorPlugin implements Interceptor {
 		return Plugin.wrap(target, this);
 	}
 	public void setProperties(Properties p) {
-		dialect = p.getProperty("dialect");
-		if (dialect == null || dialect.trim().isEmpty()) {
-			try {
-				throw new PropertyException("dialect property is not found!");
-			} catch (PropertyException e) {
-				e.printStackTrace();
-			}
+		String dialect = p.getProperty("dialect");
+		if (dialect != null && !dialect.trim().isEmpty()) {
+			this.dialect = dialect;
 		}
 	}
 }
