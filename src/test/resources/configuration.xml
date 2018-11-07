@@ -16,7 +16,7 @@ PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
 	<typeAliases>
 	</typeAliases>
 	<plugins>
-		<plugin interceptor="cn.sirenia.mybatis.plugin.TwPlugin">
+		<plugin interceptor="cn.sirenia.mybatis.plugin.BaseMapperPlugin">
 		</plugin>
 		<!-- <plugin interceptor="cn.sirenia.mybatis.plugin.AutoSqlExecutorPlugin">
 			方言
@@ -27,7 +27,7 @@ PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
 		</plugin>
 	</plugins>
 	<environments default="development">
-		<environment id="development">
+		<!-- <environment id="development">
 			<transactionManager type="JDBC" />
 			<dataSource type="POOLED">
 				<property name="driver" value="org.postgresql.Driver" />
@@ -35,9 +35,19 @@ PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
 				<property name="username" value="postgres" />
 				<property name="password" value="123456" />
 			</dataSource>
+		</environment> -->
+		<environment id="development">
+			<transactionManager type="JDBC" />
+			<dataSource type="POOLED">
+				<property name="driver" value="com.mysql.jdbc.Driver" />
+				<property name="url" value="jdbc:mysql://localhost:3306/test?characterEncoding=UTF-8" />
+				<property name="username" value="root" />
+				<property name="password" value="" />
+			</dataSource>
 		</environment>
 	</environments>
 	<mappers>
 		<!-- <mapper resource="cn/sirenia/mybatis/mapper/xml/UserMapper.xml" /> -->
+		<mapper resource="UserMapper.xml" />
 	</mappers>
 </configuration>

@@ -1,7 +1,5 @@
 package cn.sirenia.mybatis.plugin;
 
-import java.lang.reflect.Method;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
@@ -19,28 +17,20 @@ import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.ResultHandler;
 import org.apache.ibatis.session.RowBounds;
 
-import cn.sirenia.mybatis.sql.provider.TwSqlProvider;
 import cn.sirenia.mybatis.util.ReflectHelper;
 import cn.sirenia.mybatis.util.XMLMapperConf;
 import cn.sirenia.mybatis.util.groovy.GroovyScriptHelper;
+import groovy.lang.GroovyObject;
 
 @Intercepts({
 		@Signature(type = Executor.class, method = "query", args = { MappedStatement.class, Object.class,
 				RowBounds.class, ResultHandler.class }),
 		@Signature(type = Executor.class, method = "update", args = { MappedStatement.class, Object.class }) })
-//AutoSqlExecutorPlugin的另一种实现方式，这个类改的是MappedStatement
-public class TwPlugin implements Interceptor {
+public class BaseMapperPlugin implements Interceptor {
 
 	// private static final Logger logger =
 	// Logger.getLogger(ExecutorPlugin.class);
 	private String dialect = "postgresql"; // 数据库方言
-	private final Map<String, Method> providerMethodMap = new HashMap<>();
-	{
-		Method[] methods = TwSqlProvider.class.getMethods();
-		for (Method m : methods) {
-			providerMethodMap.put(m.getName(), m);
-		}
-	}
 
 	public Object intercept(Invocation invocation) throws Throwable {
 		Object[] args = invocation.getArgs();
@@ -57,19 +47,17 @@ public class TwPlugin implements Interceptor {
 				if (("sirenia-" + methodName).equals(sql)) {
 					//动态创建sql
 					String mapperClazzName = statementId.substring(0, index);
-					TwSqlProvider provider = new TwSqlProvider();
-					Method method = providerMethodMap.get(methodName);
 					Class<?> paramClazz = parameterObject == null ? null : parameterObject.getClass();
 					String script = null;
 					try{
-						TwSqlProvider.tl.set(XMLMapperConf.of(configuration, mapperClazzName,dialect));
-						script = (String) method.invoke(provider);
-					}finally{
-						TwSqlProvider.tl.remove();
+						XMLMapperConf conf = XMLMapperConf.of(configuration, mapperClazzName,dialect);
+						GroovyObject go = GroovyScriptHelper.loadGroovyScript("cn.sirenia.mybatis.sql.provider.DynSqlProvider",true);
+						script = go.invokeMethod(methodName,conf).toString();
+					}catch(Exception e){
+						throw new RuntimeException(e);
 					}
 					//构建MappedStatement
-					SqlSource sqlSource = new XMLLanguageDriver().createSqlSource(configuration, script.toString(),
-							paramClazz);
+					SqlSource sqlSource = new XMLLanguageDriver().createSqlSource(configuration, script,	paramClazz);
 					SqlCommandType sqlCommandType = statement.getSqlCommandType();
 					MappedStatement ms = new MappedStatement.Builder(configuration, statementId, sqlSource, sqlCommandType )
 							.resultMaps(statement.getResultMaps() ).build();
