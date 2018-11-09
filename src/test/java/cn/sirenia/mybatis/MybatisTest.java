@@ -40,7 +40,7 @@ public class MybatisTest {
         XMLConfigBuilder xMConfigBuilder = new XMLConfigBuilder(reader);
         Configuration configuration = xMConfigBuilder.parse();
         //替换configuration的mapperRegistry，支持写Mapper的实现类
-        //MyMapperRegistry.replaceConfigMapperRegistry(configuration);
+        MyMapperRegistry.replaceConfigMapperRegistry(configuration);
         sqlSessionFactory = new DefaultSqlSessionFactory(configuration);
         // SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(reader);
     }
