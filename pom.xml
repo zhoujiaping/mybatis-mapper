@@ -8,6 +8,8 @@
 		<spring-version>4.2.5.RELEASE</spring-version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<jackson>2.6.5</jackson>
+		<slf4j.version>1.7.12</slf4j.version>
+		<logback.version>1.2.3</logback.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -69,6 +71,36 @@
 			<artifactId>groovy-all</artifactId>
 			<version>3.0.0-alpha-3</version>
 			<type>pom</type>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>${slf4j.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>jcl-over-slf4j</artifactId>
+			<version>${slf4j.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-core</artifactId>
+			<version>${logback.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-classic</artifactId>
+			<version>${logback.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.alibaba</groupId>
+			<artifactId>fastjson</artifactId>
+			<version>1.2.29</version>
+			<scope>provided</scope>
 		</dependency>
 	</dependencies>
 	<build>

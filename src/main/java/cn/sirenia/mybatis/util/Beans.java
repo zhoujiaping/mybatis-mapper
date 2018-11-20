@@ -39,7 +39,7 @@ public class Beans {
 		if(array.length==1){
 			return column;
 		}
-		System.out.println(String.join(",", array));
+		//System.out.println(String.join(",", array));
 		for(int i=1;i<array.length;i++){
 			array[i] = array[i].substring(0, 1).toUpperCase()+array[i].substring(1);
 		}
