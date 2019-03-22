@@ -46,7 +46,7 @@ public class AutoSqlExecutorPlugin implements Interceptor {
 			providerMethodMap.put(m.getName(), m);
 		}
 	}
-
+	@Override
 	public Object intercept(Invocation invocation) throws Throwable {
 		Object[] args = invocation.getArgs();
 		MappedStatement statement = (MappedStatement) args[0];
@@ -79,10 +79,11 @@ public class AutoSqlExecutorPlugin implements Interceptor {
 		Object ret = invocation.proceed();
 		return ret;
 	}
-
+	@Override
 	public Object plugin(Object target) {
 		return Plugin.wrap(target, this);
 	}
+	@Override
 	public void setProperties(Properties p) {
 		dialect = p.getProperty("dialect");
 		if (dialect == null || dialect.trim().isEmpty()) {

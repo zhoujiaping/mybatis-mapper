@@ -12,4 +12,15 @@
   	'haizeiwang' as "father.fav_movie"
   	from sys_user;
   </select>
+  <select id="selectByName" parameterType="String" resultMap="BaseResultMap">
+  	select * from sys_user where name = #{aaa};<!-- 只有一个参数的时候，sql占位符里面参数名随便用什么都一样。但这样不规范，容易
+  	产生理解问题
+  	 -->
+  </select>
+   <select id="selectByMap" parameterType="map" resultMap="BaseResultMap">
+  	select * from sys_user where name = #{name};
+  </select>
+   <select id="selectByUser" parameterType="cn.sirenia.mybatis.model.User" resultMap="BaseResultMap">
+  	select * from sys_user where name = #{name};
+  </select>
 </mapper>

@@ -1,8 +1,8 @@
 package cn.sirenia.mybatis;
 
-import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -23,8 +23,6 @@ import cn.sirenia.mybatis.model.User;
 import cn.sirenia.mybatis.plugin.model.Example;
 import cn.sirenia.mybatis.plugin.model.IndexPage;
 import cn.sirenia.mybatis.plugin.model.PageRes;
-import cn.sirenia.mybatis.registry.MyMapperRegistry;
-import cn.sirenia.mybatis.util.ReflectHelper;
 
 public class MybatisTest {
 
@@ -40,7 +38,7 @@ public class MybatisTest {
         XMLConfigBuilder xMConfigBuilder = new XMLConfigBuilder(reader);
         Configuration configuration = xMConfigBuilder.parse();
         //替换configuration的mapperRegistry，支持写Mapper的实现类
-        MyMapperRegistry.replaceConfigMapperRegistry(configuration);
+        //MyMapperRegistry.replaceConfigMapperRegistry(configuration);
         sqlSessionFactory = new DefaultSqlSessionFactory(configuration);
         // SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(reader);
     }
@@ -238,6 +236,19 @@ public class MybatisTest {
     public void selectByPrimaryKey() throws Exception{
         SqlSession session = sqlSessionFactory.openSession();
         UserMapper userMapper = session.getMapper(UserMapper.class);
+        List<User> users = userMapper.selectByName("eminem");
+        System.out.println(users);
+        
+        Map<String, Object> map = new HashMap<>();
+        map.put("name", "eminem");
+		users = userMapper.selectByMap(map );
+		System.out.println(users);
+        
+		User u = new User();
+		u.setName("eminem");
+		users = userMapper.selectByUser(u);
+		System.out.println(users);
+		
         User user = userMapper.selectByPrimaryKey(-1);
         userMapper.selectByPrimaryKey(-1);
         userMapper.selectByPrimaryKey(-1);

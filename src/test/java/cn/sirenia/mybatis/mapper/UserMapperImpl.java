@@ -1,6 +1,7 @@
 package cn.sirenia.mybatis.mapper;
 
 import java.util.List;
+import java.util.Map;
 
 import cn.sirenia.mybatis.model.User;
 import cn.sirenia.mybatis.plugin.model.Example;
@@ -118,6 +119,24 @@ public class UserMapperImpl implements UserMapper {
 
 	@Override
 	public Integer selectKey() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<User> selectByName(String name) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<User> selectByMap(Map<String, Object> map) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<User> selectByUser(User u) {
 		// TODO Auto-generated method stub
 		return null;
 	}
