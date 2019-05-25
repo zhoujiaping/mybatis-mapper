@@ -1,6 +1,6 @@
 package cn.sirenia.mybatis.util;
 
-public class Beans {
+public class BeanUtil {
 	//private static final Pattern PATTERN = Pattern.compile("_[a-z]",Pattern.MULTILINE); 
 	/**
 	 * 驼峰命名转下划线命名

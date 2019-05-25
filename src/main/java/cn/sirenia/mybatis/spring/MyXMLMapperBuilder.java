@@ -52,7 +52,7 @@ import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.TypeHandler;
 
-import cn.sirenia.mybatis.util.Beans;
+import cn.sirenia.mybatis.util.BeanUtil;
 
 /**
  * @author Clinton Begin
@@ -160,7 +160,7 @@ private XNode mapModelToBaseResultMapNode(Class<?> modelClass) {
 			if(jdbcType==null){
 				continue;
 			}
-			String columnName = Beans.camel2underline(fields[i].getName());
+			String columnName = BeanUtil.camel2underline(fields[i].getName());
 			String propertyName = fields[i].getName();
 			if(fields[i].getName().equals("id")){
 				sb.append(String.format("<id column=\"%s\" jdbcType=\"%s\" property=\"%s\" />",columnName,jdbcType,propertyName));
