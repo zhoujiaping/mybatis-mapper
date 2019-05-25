@@ -20,27 +20,27 @@
     Pageable有两个子类LimitPage和IndexPage，分别用于limit-offset方式的分页和index-size方式的分页。
 
 2. mybatis单表CURD通用dao
-    * int countByExample(EXAMPLE example);//example是查询条件的封装，支持mybatis-generator的Example以及该项目中自定义的Example。
-    * int countByExample(EXAMPLE example);
-    * int deleteByExample(EXAMPLE example);
-    * int insert(ENTITY record);
-    * int insertSelective(ENTITY record);
-    * List<ENTITY> selectByExample(EXAMPLE example);
-    * ENTITY selectUniqueByExample(EXAMPLE example);
-    * int updateByExampleSelective(@Param("record") ENTITY record, @Param("example") EXAMPLE example);
-    * int updateByExample(@Param("record") ENTITY record, @Param("example") EXAMPLE example);
-    * List<ENTITY> selectByExampleByPage(@Param("example") EXAMPLE example, @Param("page") Pageable page);
+@ResultType(Integer.class)
+    * int countByExample(EXAMPLE example);//根据Example条件统计条数
+    * int deleteByExample(EXAMPLE example);//根据Example条件删除
+    * int insert(ENTITY record);//插入一条，必须指定所有字段
+    * int insertSelective(ENTITY record);//插入一条，只设置不为null的字段
+    * List<ENTITY> selectByExample(EXAMPLE example);//根据Example查询
+    * ENTITY selectUniqueByExample(EXAMPLE example);//根据Example查询唯一一条
+    * int updateByExampleSelective(@Param("record") ENTITY record, @Param("example") EXAMPLE example);//根据Example更新
+    * int updateByExample(@Param("record")ENTITY record, @Param("example")EXAMPLE example);//根据Example更新，null值会更新表字段为null
+    * PageResWraper<ENTITY> selectByExample(@Param("example") EXAMPLE example, @Param("page") Pageable page);
     * int batchInsert(@Param("recordList") List<ENTITY> recordList);
     * int batchInsertSelective(@Param("recordList") List<ENTITY> recordList);
-    * int deleteByPrimaryKey(@Param("id") PK id);// @Param("id")不要删除，约定名称为传参名为id，这样简单方便。
-    * int deleteByPrimaryKeyAndOptiVersion(@Param("id") PK id,@Param("optiVersion")long optiVersion);// @Param("id")不要删除，约定名称为传参名为id，这样简单方便。
-    
-    * ENTITY selectByPrimaryKey(@Param("id") PK id);// @Param("id")不要删除，约定名称为传参名为id，这样简单方便。
+    * int deleteByPrimaryKey(@Param("id") PK id);
+    * int deleteByPrimaryKeyAndVersion(@Param("id") PK id,@Param("version")Integer version);
+    * ENTITY selectByPrimaryKey(@Param("id") PK id);
     * int updateByPrimaryKeySelective(ENTITY record);
-    * int updateByPrimaryKeyAndOptiVersionSelective(ENTITY record);
+    * int updateByPrimaryKeySelectiveAndVersion(ENTITY record);//支持乐观锁的更新
     * int updateByPrimaryKey(ENTITY record);
-	  * int updateByPrimaryKeyAndOptiVersion(ENTITY record);
-    * PK selectKey();
+    * int updateByPrimaryKeyAndVersion(ENTITY record);
+    * int insertSelectiveSelectKey(ENTITY record);*/
+    * PK selectKey();//获取id，对于postgresql，要先执行它再执行insert。对于mysql相反。
 	
 3. 通用dao支持两种查询条件的封装方式；
 
