@@ -37,7 +37,11 @@ import cn.sirenia.mybatis.util.ReflectHelper;
  * StatementHandler --BaseStatementHandler（abstract）
  * ----CallableStatementHandler ----PreparedStatementHandler
  * ----SimpleStatementHandler --RoutingStatementHandler
- * 
+ *  * configuration.xml中可以配置settings的useGeneratedKeys为true，
+ * 但是需要mapper.xml中的insert标签有keyProperty属性才能有效。
+ * 所以该插件的另外一个思路，是配置全局的useGeneratedKeys为true，
+ * 然后获取@KeyGen注解，获取keyProperties和keyColumn，
+ * 设置到MappedStatement对象中。
  * 
  */
 @Intercepts({
