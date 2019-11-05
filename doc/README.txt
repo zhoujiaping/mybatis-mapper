@@ -48,9 +48,9 @@ public class User{
 主键的类型（如果没有主键，就随便给个类型，一般没有主键就用Object）。
 Table注解，指明了该Mapper操作的表名。（为什么不加在实体类中？我们待会儿解释）
 import cn.sirenia.deeplan.perm.model.User;
-import cn.sirenia.mybatis.anno.Table;
-import cn.sirenia.mybatis.mapper.BaseMapper;
-import cn.sirenia.mybatis.model.Example;
+import Table;
+import BaseMapper;
+import com.xxxxx.module.mybatis.model.Example;
 @Table(name="sys_user")
 public interface UserMapper extends BaseMapper<User,Example,Integer>{
 	//对于基本的单表CURD，不需要写方法。
@@ -58,9 +58,9 @@ public interface UserMapper extends BaseMapper<User,Example,Integer>{
 你可能在想，还不如使用maven的mybatis-generator插件。别急，先跟着把例子做完。
 4、配置mybatis单表操作的插件。可以参考mybatis官网。
 <plugins>
-	<plugin interceptor="cn.sirenia.mybatis.plugin.ExecutorPlugin">
+	<plugin interceptor="com.xxxxx.module.mybatis.plugin.ExecutorPlugin">
 	</plugin>
-	<!--<plugin interceptor="cn.sirenia.mybatis.plugin.PagePlugin">
+	<!--<plugin interceptor="PagePlugin">
 		<property name="dialect" value="postgre" />
 		<property name="pageSqlId" value=".*ByPage.*" />
 	</plugin>-->
@@ -121,7 +121,7 @@ XXXMapper.xml中写的sql，尽可能面向某一张表。不要在其中查询�
 分页插件是从网上找的，后来自己进行了一些改造。
 要使用分页功能，需要在mybatis的配置文件中配置
 <plugins>
-	<plugin interceptor="cn.sirenia.mybatis.plugin.PagePlugin">
+	<plugin interceptor="PagePlugin">
 		<property name="dialect" value="postgre" />
 		<property name="pageSqlId" value=".*ByPage.*" />
 	</plugin>
@@ -154,7 +154,7 @@ BaseMapper中的*ByPage方法需要分页插件的支持。
 这个支持，是基于和spring整合的。
 需要修改application-mybatis.xml中的SqlSessionFactoryBean和MapperScannerConfigurer配置。
 如下
-<bean id="sqlSessionFactory" class="cn.sirenia.mybatis.builder.MySqlSessionFactoryBean">
+<bean id="sqlSessionFactory" class="com.xxxxx.module.mybatis.builder.MySqlSessionFactoryBean">
 	<property name="dataSource" ref="dataSrouce" />
 	<property name="configLocation" value="classpath:sql-map-config.xml"/>
 	<property name="mapperLocations">
@@ -165,9 +165,9 @@ BaseMapper中的*ByPage方法需要分页插件的支持。
 	</property>
 </bean>
 <!-- 扫描 basePackage下所有的接口，根据对应的mapper.xml为其生成代理类 -->
-<bean class="cn.sirenia.mybatis.builder.MyMapperScannerConfigurer">
+<bean class="com.xxxxx.module.mybatis.builder.MyMapperScannerConfigurer">
 	<property name="sqlSessionFactoryBeanName" value="sqlSessionFactory" />
-	<property name="annotationClass" value="cn.sirenia.mybatis.anno.Table"></property>
+	<property name="annotationClass" value="Table"></property>
 	<property name="basePackage" value="cn.sirenia.**.mapper" />
 </bean>
 这样，在mybatis启动的时候，就会在XXXMapper.xml不存在的时候，自动使用默认的内容提供给mybatis。

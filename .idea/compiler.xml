@@ -11,6 +11,8 @@
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="mybatis-mapper" target="1.8" />
+      <module name="mybatis-mapper.main" target="1.8" />
+      <module name="mybatis-mapper.test" target="1.8" />
     </bytecodeTargetLevel>
   </component>
 </project>

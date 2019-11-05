@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Gradle: org.codehaus.groovy:groovy-console:3.0.0-alpha-3">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.codehaus.groovy/groovy-console/3.0.0-alpha-3/f2686918e2ca3ecd5604b0efebd5ac310d9376c9/groovy-console-3.0.0-alpha-3.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.codehaus.groovy/groovy-console/3.0.0-alpha-3/ceebda4b0eb90452ba45f9bcd4992f6f2f864369/groovy-console-3.0.0-alpha-3-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Gradle: org.codehaus.groovy:groovy-dateutil:3.0.0-alpha-3">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.codehaus.groovy/groovy-dateutil/3.0.0-alpha-3/a10de49893f6e684e0b1d2d213dc18bd8b13ff7b/groovy-dateutil-3.0.0-alpha-3.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.codehaus.groovy/groovy-dateutil/3.0.0-alpha-3/bd59d60f0195d4cf143c16facbe33dff6c8da9aa/groovy-dateutil-3.0.0-alpha-3-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
