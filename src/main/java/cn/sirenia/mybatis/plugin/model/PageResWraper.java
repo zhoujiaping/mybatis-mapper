@@ -53,6 +53,9 @@ public class PageResWraper<T> implements List<T>,Serializable{
         pageRes.setRows(rows);
         return pageRes;
     }
+    public PageRes<T> toPageRes(){
+        return PageRes.of(rows,total);
+    }
 	@Override
 	public int size() {
 		return rows.size();

@@ -22,7 +22,6 @@ import org.apache.ibatis.session.RowBounds;
 import cn.sirenia.mybatis.sql.provider.TwSqlProvider;
 import cn.sirenia.mybatis.util.ReflectHelper;
 import cn.sirenia.mybatis.util.XMLMapperConf;
-import cn.sirenia.mybatis.util.groovy.GroovyScriptHelper;
 
 @Intercepts({
 		@Signature(type = Executor.class, method = "query", args = { MappedStatement.class, Object.class,
